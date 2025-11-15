@@ -7,7 +7,7 @@ export default function Sidebar() {
   const [openDesign, setOpenDesign] = React.useState(false);
 
   return (
-    <div className="w-64 bg-white border-r shadow max-h-[700px] flex flex-col">
+    <div className="w-64 bg-white border-r shadow h-[calc(100vh-80px)] flex flex-col">
       {/* Scrollable content area */}
       <div className="flex-1 p-4 space-y-6 overflow-y-auto">
         {/* Main Dropdown: จัดการงานก่อสร้าง */}
@@ -38,7 +38,6 @@ export default function Sidebar() {
                 </svg>
                 <span className="text-black">ประมาณการ</span>
               </div>
-
               <div className="flex items-center gap-3 cursor-pointer hover:text-purple-600">
                 <svg width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M8.16809 17.1284H3.38935C2.06974 17.1284 0.999992 16.2258 1 15.1124L1.00009 3.01605C1.0001 1.90261 2.06985 1 3.38945 1H14.1419C15.4615 1 16.5312 1.90262 16.5312 3.01606V7.04818M5.18176 5.03212H12.3498M5.18176 8.05621H12.3498M5.18176 11.0803H8.7658M11.7523 14.3489L16.8209 10.0722L20.2 12.9233L15.1314 17.2H11.7523V14.3489Z" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -62,7 +61,6 @@ export default function Sidebar() {
 
                 <span className="text-black">รายงาน</span>
               </div>
-
               <div className="flex items-center gap-3 cursor-pointer hover:text-purple-600">
                 <svg width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M7 13.1982V7.09911M13.6 10.9804V4.88125M1 14.8857V1L6.84348 3.31429L13.5217 1L20.2 3.31429V17.2L13.5217 14.8857L6.84348 17.2L1 14.8857Z" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -70,6 +68,9 @@ export default function Sidebar() {
 
                 <span className="text-black">แผนผังงาน</span>
               </div>
+
+
+              {/* เพิ่มเมนูอื่นๆ ตามต้องการ */}
             </div>
           )}
         </div>
@@ -95,7 +96,7 @@ export default function Sidebar() {
 
           {openDesign && (
             <div className="mt-4 ml-7 space-y-5">
-             
+             {/* เพิ่มเมนูย่อยตามต้องการ */}
             </div>
           )}
         </div>
