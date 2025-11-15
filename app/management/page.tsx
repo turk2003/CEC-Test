@@ -1,16 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-
-type DataItem = {
-  id: string;
-  wbs: string;
-  jobName: string;
-  supervisor: string;
-  committee: string;
-  status: string | number;
-};
-
+import { DataItem } from "@/types";
+import api from "@/lib/api";
 /* ------------------------- 1) ActionMenu (ข้างนอกสุด) ------------------------- */
 
 function ActionMenu({ status }: { status: number }) {
@@ -126,16 +118,18 @@ export default function ManagementPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://6916ccd6a7a34288a27e6818.mockapi.io/api/cpm/list")
-      .then((res) => res.json())
-      .then((json) => {
-        setData(json);
+    const fetchData = async () => {
+      try {
+        const response = await api.get('/list');
+        setData(response.data);
         setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
+      } catch (error) {
+        console.error('Error fetching data:', error);
         setLoading(false);
-      });
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
