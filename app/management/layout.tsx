@@ -1,7 +1,8 @@
 "use client";
 import { useState } from 'react';
-import Navbar from '../component/Navbar';
-import Sidebar from '../component/Sidebar';
+import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
+
 
 export default function ManagementLayout({
   children,
