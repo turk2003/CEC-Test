@@ -43,13 +43,13 @@ export default function TabSection({ activeTab, onTabChange, allCount, pendingCo
 
       {/* Right side dropdowns */}
       <div className="flex gap-4 ml-auto">
-        <select className="px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white">
+        <select className="px-4 py-2 border border-purple-700 text-purple-700  rounded-lg text-sm bg-white">
           <option>กพฟ.3</option>
           <option>กพฟ.1</option>
           <option>กพฟ.2</option>
         </select>
 
-        <select className="px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white min-w-[200px]">
+        <select className="px-4 py-2 border border-purple-700  text-purple-700  rounded-lg text-sm bg-white min-w-[200px]">
           <option>การไฟฟ้าส่วนภูมิภาคภาคอีสานตกลาง</option>
           <option>การไฟฟ้าส่วนภูมิภาคภาคเหนือ</option>
           <option>การไฟฟ้าส่วนภูมิภาคภาคใต้</option>

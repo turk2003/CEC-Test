@@ -6,9 +6,24 @@ import ActionMenu from "./ActionMenu";
 interface DataTableProps {
   data: DataItem[];
   loading: boolean;
+  filters: {
+    search: string;
+    wbs: string;
+    supervisor: string;
+    committee: string;
+    status: string;
+  };
+  onFilterChange: (filters: any) => void;
 }
 
-export default function DataTable({ data, loading }: DataTableProps) {
+export default function DataTable({ data, loading, filters, onFilterChange }: DataTableProps) {
+  const handleInputChange = (field: string, value: string) => {
+    onFilterChange({
+      ...filters,
+      [field]: value
+    });
+  };
+
   if (loading) {
     return (
       <div className="text-center py-8 text-gray-500">
@@ -21,6 +36,7 @@ export default function DataTable({ data, loading }: DataTableProps) {
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
+          {/* Header Row */}
           <tr className="border-b border-gray-200 bg-gray-50">
             <th className="text-left py-3 px-4 font-medium text-gray-700">ลำดับ</th>
             <th className="text-left py-3 px-4 font-medium text-gray-700">WBS</th>
@@ -29,6 +45,65 @@ export default function DataTable({ data, loading }: DataTableProps) {
             <th className="text-left py-3 px-4 font-medium text-gray-700">คณะกรรมการ</th>
             <th className="text-left py-3 px-4 font-medium text-gray-700">สถานะงาน</th>
             <th className="text-left py-3 px-4 font-medium text-gray-700"></th>
+          </tr>
+
+          {/* Filter Row */}
+          <tr className="border-b border-gray-200 bg-white">
+            <th className="py-2 px-4">
+              
+            </th>
+            <th className="py-2 px-4">
+              <input
+                type="text"
+                placeholder="ค้นหา"
+                value={filters.wbs}
+                onChange={(e) => handleInputChange('wbs', e.target.value)}
+                className="w-full px-2 py-1 border border-gray-300 rounded text-sm placeholder-gray-400"
+              />
+            </th>
+            <th className="py-2 px-4">
+              <input
+                type="text"
+                placeholder="ค้นหา"
+                value={filters.search}
+                onChange={(e) => handleInputChange('search', e.target.value)}
+                className="w-full px-2 py-1 border border-gray-300 rounded text-sm placeholder-gray-400"
+              />
+            </th>
+            <th className="py-2 px-4">
+              <input
+                type="text"
+                placeholder="ชื่อ/รหัสพนักงาน"
+                value={filters.supervisor}
+                onChange={(e) => handleInputChange('supervisor', e.target.value)}
+                className="w-full px-2 py-1 border border-gray-300 rounded text-sm placeholder-gray-400"
+              />
+            </th>
+            <th className="py-2 px-4">
+              <input
+                type="text"
+                placeholder="ชื่อ/รหัสพนักงาน"
+                value={filters.committee}
+                onChange={(e) => handleInputChange('committee', e.target.value)}
+                className="w-full px-2 py-1 border border-gray-300 rounded text-sm placeholder-gray-400"
+              />
+            </th>
+            <th className="py-2 px-4">
+              <select
+                value={filters.status}
+                onChange={(e) => handleInputChange('status', e.target.value)}
+                className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-white"
+              >
+                <option value="">ทั้งหมด</option>
+                <option value="0">เชื่อมประมาณการ</option>
+                <option value="1">กำลังดำเนินการ</option>
+                <option value="2">ตรวจสอบผ่าน</option>
+                <option value="3">ตรวจสอบไม่ผ่าน</option>
+              </select>
+            </th>
+            <th className="py-2 px-4">
+              {/* Empty column for actions */}
+            </th>
           </tr>
         </thead>
 

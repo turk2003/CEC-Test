@@ -5,7 +5,6 @@ import { DataItem } from "@/types";
 import api from "@/lib/api";
 import DataTable from "./components/DataTable";
 import TabSection from "./components/TabSection";
-import FilterSection from "./components/FilterSection";
 
 export default function ManagementPage() {
   const [data, setData] = useState<DataItem[]>([]);
@@ -42,7 +41,7 @@ export default function ManagementPage() {
 
     // Tab filter
     if (activeTab === 'pending') {
-      filtered = filtered.filter(item => item.status !== 2); // ไม่ใช่ "ตรวจสอบผ่าน"
+      filtered = filtered.filter(item => item.status !== 2);
     }
 
     // Apply filters
@@ -91,6 +90,12 @@ export default function ManagementPage() {
           จัดการงานก่อสร้าง
         </h1>
       </div>
+      <div className="mb-6 ml-1">
+        <h1 className="text-lg text-gray-900 mb-2">
+          จัดการงานก่อสร้าง
+        </h1>
+      </div>
+      <div className="bg-white p-6 rounded-lg shadow">
 
       {/* Tabs */}
       <TabSection 
@@ -100,15 +105,15 @@ export default function ManagementPage() {
         pendingCount={data.filter(item => item.status !== 2).length}
       />
 
-      {/* Filter Section */}
-      <FilterSection 
-        filters={filters}
-        onFilterChange={handleFilterChange}
-      />
-
-      {/* Data Table */}
+      {/* Data Table with embedded filters */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <DataTable data={filteredData} loading={loading} />
+        <DataTable 
+          data={filteredData} 
+          loading={loading}
+          filters={filters}
+          onFilterChange={handleFilterChange}
+        />
+      </div>
       </div>
     </div>
   );
