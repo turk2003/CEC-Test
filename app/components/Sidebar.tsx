@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
-
+import Link from "next/link";
 export default function Sidebar() {
   const [openConstruction, setOpenConstruction] = React.useState(true);
   const [openDesign, setOpenDesign] = React.useState(false);
@@ -38,13 +38,16 @@ export default function Sidebar() {
                 </svg>
                 <span className="text-black">ประมาณการ</span>
               </div>
-              <div className="flex items-center gap-3 cursor-pointer hover:text-purple-600">
+              <Link
+                href="/management/constructions"
+                className="flex items-center gap-3 cursor-pointer hover:text-purple-600"
+              >
                 <svg width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M8.16809 17.1284H3.38935C2.06974 17.1284 0.999992 16.2258 1 15.1124L1.00009 3.01605C1.0001 1.90261 2.06985 1 3.38945 1H14.1419C15.4615 1 16.5312 1.90262 16.5312 3.01606V7.04818M5.18176 5.03212H12.3498M5.18176 8.05621H12.3498M5.18176 11.0803H8.7658M11.7523 14.3489L16.8209 10.0722L20.2 12.9233L15.1314 17.2H11.7523V14.3489Z" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-
                 <span className="text-black">พัสดุงานก่อสร้าง</span>
-              </div>
+              </Link>
+            
 
               <div className="flex items-center gap-3 cursor-pointer hover:text-purple-600">
                 <svg width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg">

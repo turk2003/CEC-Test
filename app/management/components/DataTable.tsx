@@ -50,7 +50,6 @@ export default function DataTable({ data, loading, filters, onFilterChange }: Da
           {/* Filter Row */}
           <tr className="border-b border-gray-200 bg-white">
             <th className="py-2 px-4">
-              
             </th>
             <th className="py-2 px-4">
               <input
