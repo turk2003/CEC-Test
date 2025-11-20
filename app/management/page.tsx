@@ -1,10 +1,11 @@
 "use client";
-
+import Cookies from 'js-cookie';
 import React, { useEffect, useState } from "react";
 import { DataItem } from "@/types";
 import api from "@/lib/api";
 import DataTable from "./components/DataTable";
 import TabSection from "./components/TabSection";
+import axios from "axios";
 
 export default function ManagementPage() {
   const [data, setData] = useState<DataItem[]>([]);
@@ -34,6 +35,26 @@ export default function ManagementPage() {
 
     fetchData();
   }, []);
+  //test
+  useEffect(() => {
+    const fetchData2 = async () => {
+      
+      try {
+       const response = await api.get('/api/v1/pea', {
+       
+      });
+        console.log('Fetched constructions:', response.data); 
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData2();
+  }, []);
+  
+
 
   // Filter data based on active tab and filters
   useEffect(() => {

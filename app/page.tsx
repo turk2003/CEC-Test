@@ -4,10 +4,9 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
-
+import { ssoLoginUrl } from "@/service/index";
 // กำหนด Keycloak Login URL
-const keycloakLoginUrl = `${process.env.NEXT_PUBLIC_KEYCLOAK_ISSUER}/protocol/openid-connect/auth?client_id=${process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_NEXTAUTH_URL || 'http://localhost:3000')}&response_type=code&scope=openid`;
-
+const keycloakLoginUrl = ssoLoginUrl;
 const LandingPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -17,15 +16,21 @@ const LandingPage = () => {
     console.log("keycloakLoginUrl", keycloakLoginUrl);
   }, []);
 
-  // const handleLogin = () => {
-  //   window.location.href = keycloakLoginUrl;
-  // };
-  const handleLogin = () => {
+
+//   const handleLogin = () => {
+//   // เพิ่ม redirect_uri parameter
+//   const redirectUri = encodeURIComponent(`${window.location.origin}/auth/callback`);
+//   const loginUrl = `${keycloakLoginUrl}?redirect_uri=${redirectUri}`;
+  
+//   console.log("Redirecting to:", loginUrl);
+//   window.location.href = loginUrl;
+// };
+const handleLogin = () => {
     // ตอนนี้ให้ไป dashboard เลย ไม่ต้องใช้ Keycloak จริง
     // window.location.href = keycloakLoginUrl;
     
     // เซ็ต dummy token
-    Cookies.set("token", "dummy-token-123", {
+    Cookies.set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3ODMsImVtcGxveWVlSWQiOiI1MTIzMjUiLCJ0aXRsZSI6IuC4meC4suC4oiIsImZpcnN0TmFtZSI6IuC4iuC4seC4iuC4nuC4pSIsImxhc3ROYW1lIjoi4LiK4Li54Lin4LiH4Lio4LmM4Lin4Li44LiS4Li0IiwicG9zaXRpb24iOiLguJ7guIrguIcuMyjguK7guKUpIiwiYnVzaW5lc3NBcmVhIjoiSDA5MSIsImJ1c2luZXNzQXJlYU5hbWUiOiLguIHguJ_guK0u4LmB4LiB4Lil4LiHIiwiZGVwdENoYW5nZUNvZGUiOiI0MzAyNTIxMDIwMDAyMDAiLCJwb3NpdGlvbldpdGhEZXB0TmFtZSI6IiIsImlzcyI6Imh0dHBzOi8vYXBpLWNlYy1kZXYucGVhLmNvLnRoIiwic3ViIjoiNTEyMzI1IiwiYXVkIjpbInBlYS1jbWNkIl0sImV4cCI6MTc2MzY2NjMyMCwiaWF0IjoxNzYzNjUxOTIwLCJqdGkiOiJkNGZqMmsxYWMycGpvZ2lvcWNmZyJ9.Tsaic4RtUi5S7yxUw9zxX6XIIUBU5IzfZgfdz-4fdK8", {
       path: "/",
       expires: 1 / 24, // 1 ชั่วโมง
     });
@@ -39,7 +44,7 @@ const LandingPage = () => {
     const code = searchParams.get("code"); // Keycloak returns 'code' parameter
     
     if (token) {
-      Cookies.set("token", token, {
+      Cookies.set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3ODMsImVtcGxveWVlSWQiOiI1MTIzMjUiLCJ0aXRsZSI6IuC4meC4suC4oiIsImZpcnN0TmFtZSI6IuC4iuC4seC4iuC4nuC4pSIsImxhc3ROYW1lIjoi4LiK4Li54Lin4LiH4Lio4LmM4Lin4Li44LiS4Li0IiwicG9zaXRpb24iOiLguJ7guIrguIcuMyjguK7guKUpIiwiYnVzaW5lc3NBcmVhIjoiSDA5MSIsImJ1c2luZXNzQXJlYU5hbWUiOiLguIHguJ_guK0u4LmB4LiB4Lil4LiHIiwiZGVwdENoYW5nZUNvZGUiOiI0MzAyNTIxMDIwMDAyMDAiLCJwb3NpdGlvbldpdGhEZXB0TmFtZSI6IiIsImlzcyI6Imh0dHBzOi8vYXBpLWNlYy1kZXYucGVhLmNvLnRoIiwic3ViIjoiNTEyMzI1IiwiYXVkIjpbInBlYS1jbWNkIl0sImV4cCI6MTc2MzY2NjMyMCwiaWF0IjoxNzYzNjUxOTIwLCJqdGkiOiJkNGZqMmsxYWMycGpvZ2lvcWNmZyJ9.Tsaic4RtUi5S7yxUw9zxX6XIIUBU5IzfZgfdz-4fdK8", {
         path: "/",
         expires: 1 / 24, // 1 ชั่วโมง
       });
