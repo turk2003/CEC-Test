@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { DataItem } from "@/types";
 import StatusButton from "./StatusButton";
 import ActionMenu from "./ActionMenu";
@@ -22,6 +23,11 @@ export default function DataTable({ data, loading, filters, onFilterChange }: Da
       ...filters,
       [field]: value
     });
+  };
+
+  const handleRowClick = (itemId: string) => {
+    // Navigate to construction detail page
+    window.location.href = `/management/constructions/${itemId}`;
   };
 
   if (loading) {
@@ -50,6 +56,7 @@ export default function DataTable({ data, loading, filters, onFilterChange }: Da
           {/* Filter Row */}
           <tr className="border-b border-gray-200 bg-white">
             <th className="py-2 px-4">
+              {/* Empty for row number */}
             </th>
             <th className="py-2 px-4">
               <input
@@ -115,9 +122,10 @@ export default function DataTable({ data, loading, filters, onFilterChange }: Da
             </tr>
           ) : (
             data.map((item, index) => (
-              <tr
-                key={item.id}
-                className="border-b border-gray-100 hover:bg-gray-50"
+              <tr 
+                key={item.id} 
+                className="border-b border-gray-100 hover:bg-purple-50 cursor-pointer transition-colors"
+                onClick={() => handleRowClick(item.id)}
               >
                 <td className="py-4 px-4 text-gray-900">{index + 1}</td>
                 <td className="py-4 px-4 text-gray-900">{item.wbs}</td>
@@ -134,7 +142,12 @@ export default function DataTable({ data, loading, filters, onFilterChange }: Da
                 <td className="py-4 px-4">
                   <StatusButton status={item.status} />
                 </td>
-                <td className="py-4 px-4">
+                <td 
+                  className="py-4 px-4" 
+                  onClick={(e) => {
+                    e.stopPropagation(); // ป้องกันไม่ให้ไปหน้า construction
+                  }}
+                >
                   <ActionMenu 
                     id={item.id}
                     status={Number(item.status)} 
