@@ -136,6 +136,7 @@ export default function DataTable({ data, loading, filters, onFilterChange }: Da
                 </td>
                 <td className="py-4 px-4">
                   <ActionMenu 
+                    id={item.id}
                     status={Number(item.status)} 
                     onEdit={() => console.log(`แก้ไข ${item.con_name}`)}
                     onReset={() => console.log(`รีเซ็ต ${item.con_name}`)}

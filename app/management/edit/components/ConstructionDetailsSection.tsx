@@ -1,0 +1,98 @@
+import React from "react";
+import { DataItem } from "@/types";
+
+type ConstructionDetailsSectionProps = {
+  formData: Partial<DataItem>;
+  onFieldChange?: (field: keyof DataItem, value: string | number) => void;
+  onLinkOldEstimate: () => void;
+  onLinkNewEstimate: () => void;
+};
+
+const readOnlyInputClass =
+  "w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed text-gray-500";
+
+export default function ConstructionDetailsSection({
+  formData,
+  onFieldChange,
+  onLinkOldEstimate,
+  onLinkNewEstimate
+}: ConstructionDetailsSectionProps) {
+  return (
+    <section>
+      <div className="flex items-center gap-2 mb-4">
+        <svg width="19" height="22" viewBox="0 0 19 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M8.2 20.1999H3.39999C2.0745 20.1999 0.999991 19.1254 1 17.7999L1.00009 3.39999C1.0001 2.07451 2.07462 1 3.40009 1H14.2004C15.5258 1 16.6004 2.07452 16.6004 3.4V10M17.8004 17.7574L15.3461 20.2M15.3461 20.2L13.0004 17.8678M15.3461 20.2V14.2M5.20037 5.8H12.4004M5.20037 9.4H12.4004M5.20037 13H8.80038"
+            stroke="black"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <h2 className="text-lg font-semibold text-gray-900">รายละเอียดงานก่อสร้าง</h2>
+      </div>
+
+      <div className="grid grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            WBS <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={formData.wbs || ""}
+            onChange={(e) => onFieldChange?.("wbs", e.target.value)}
+            className={readOnlyInputClass}
+            placeholder="กรอก WBS"
+            disabled
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            ชื่องาน <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={formData.con_name || ""}
+            onChange={(e) => onFieldChange?.("con_name", e.target.value)}
+            className={readOnlyInputClass}
+            placeholder="กรอกชื่องาน"
+            disabled
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            หมายเลขผังงาน <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value="หมายเลขผังงาน"
+            onChange={(e) => onFieldChange?.("wbs", e.target.value)}
+            className={readOnlyInputClass}
+            placeholder="กรอก WBS"
+            disabled
+          />
+        </div>
+
+        <div className="col-span-2 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onLinkOldEstimate}
+            className="px-6 py-2 border border-gray-300 rounded-md text-gray-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
+          >
+            เชื่อมประมาณการเก่า
+          </button>
+          <button
+            type="button"
+            onClick={onLinkNewEstimate}
+            className="px-6 py-2 border border-gray-300 rounded-md text-gray-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
+          >
+            เชื่อมประมาณการใหม่
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+

@@ -1,16 +1,25 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface ActionMenuProps {
+  id: string;
   status: number;
   onEdit?: () => void;
   onReset?: () => void;
 }
 
-export default function ActionMenu({ status, onEdit, onReset }: ActionMenuProps) {
+export default function ActionMenu({ id, status, onEdit, onReset }: ActionMenuProps) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const isDisabled = status === 3;
+
+  const handleEdit = () => {
+    setOpen(false);
+    router.push(`/management/edit/${id}`);
+    onEdit?.();
+  };
 
   return (
     <div className="relative">
@@ -29,10 +38,7 @@ export default function ActionMenu({ status, onEdit, onReset }: ActionMenuProps)
         <div className="absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
           <button
             className="w-full flex items-center px-3 py-2 hover:bg-gray-100"
-            onClick={() => {
-              setOpen(false);
-              onEdit?.();
-            }}
+            onClick={handleEdit}
           >
             {/* SVG icon */}
             <div className="px-3 text-purple-700">แก้ไข</div>
