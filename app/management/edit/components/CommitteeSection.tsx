@@ -1,12 +1,6 @@
 import React from "react";
+import { CommitteeMember } from "@/types";
 
-export type CommitteeMember = {
-  id: string;
-  roleLabel: string;
-  employeeId?: string;
-  name?: string;
-  position?: string;
-};
 
 type CommitteeSectionProps = {
   members: CommitteeMember[];

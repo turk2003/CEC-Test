@@ -2,13 +2,13 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { DataItem } from "@/types";
+import { CommitteeMember, DataItem } from "@/types";
 import api from "@/lib/api";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import ConstructionDetailsSection from "../components/ConstructionDetailsSection";
 import SupervisorSection from "../components/SupervisorSection";
-import CommitteeSection, { CommitteeMember } from "../components/CommitteeSection";
+import CommitteeSection from "../components/CommitteeSection";
 
 export default function EditPage() {
     const router = useRouter();

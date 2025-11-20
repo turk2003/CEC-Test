@@ -7,3 +7,10 @@ export type DataItem = {
   status: string | number;
 };
 
+export type CommitteeMember = {
+  id: string;
+  roleLabel: string;
+  employeeId?: string;
+  name?: string;
+  position?: string;
+};
