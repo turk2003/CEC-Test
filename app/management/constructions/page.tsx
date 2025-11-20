@@ -55,7 +55,8 @@ export default function ConstructionsPage() {
 
   return (
     
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-2 bg-gray-50 min-h-screen">
+      <h1 className="text-black text-xl">จัดการพื้นที่ตรวจนับ</h1>
       <div className="flex items-center gap-2 text-sm text-gray-600 mb-6">
         <Link href="/management" className="hover:text-purple-600">
           จัดการพนักงานขวะบิน

@@ -7,7 +7,6 @@ interface ConstructionItem {
   code: string;
   name: string;
   status: string;
-  icon: string;
   documents?: any[];
 }
 
@@ -46,11 +45,16 @@ export default function ConstructionTable({
   };
 
   const getTypeIcon = (type: string) => {
-    const icons = {
-      "SP": "🔧", "DDE": "🔧", "CCB": "🔨", "CSC": "⚡", "BA": "🔧", "TR": "📊"
-    };
-    return icons[type as keyof typeof icons] || "📋";
+  const icons = {
+    "SP": "/construction_icon/sp.png",
+    "DDE": "/construction_icon/dde.png", 
+    "CCB": "/construction_icon/ccb.png",
+    "CSC": "/construction_icon/csc.png",
+    "BA": "/construction_icon/ba.png",
+    "TR": "/construction_icon/tr.png"
   };
+  return icons[type as keyof typeof icons] || "/icons/default.png";
+};
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -118,10 +122,14 @@ export default function ConstructionTable({
               <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
                 <td className="py-4 px-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-white text-xs font-bold">
-                      {getTypeIcon(item.type)}
+                    <div className="w-12 h-12  bg-blue-800 rounded flex items-center justify-center">
+                      <img 
+                        src={getTypeIcon(item.type)}
+                        alt={item.type}
+                        className="w-6 h-6 object-contain"
+                      />
                     </div>
-                    <span className="font-medium">{item.type}</span>
+                    <span className="font-medium text-gray-900">{item.type}</span>
                   </div>
                 </td>
                 <td className="py-4 px-4 text-gray-900">{item.code}</td>
