@@ -14,11 +14,10 @@ export default function TabSection({ activeTab, onTabChange, allCount, pendingCo
       <div className="flex">
         <button
           onClick={() => onTabChange('all')}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-            activeTab === 'all'
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'all'
               ? 'text-gray-600 border-gray-400'
               : 'text-gray-400 border-transparent hover:text-gray-600'
-          }`}
+            }`}
         >
           งานก่อสร้างทั้งหมด
           <span className="ml-2 px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded-full">
@@ -28,11 +27,10 @@ export default function TabSection({ activeTab, onTabChange, allCount, pendingCo
 
         <button
           onClick={() => onTabChange('pending')}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-            activeTab === 'pending'
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'pending'
               ? 'text-purple-600 border-purple-600'
               : 'text-gray-400 border-transparent hover:text-gray-600'
-          }`}
+            }`}
         >
           งานก่อสร้างของตนเอง
           <span className="ml-2 px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full">

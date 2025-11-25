@@ -17,28 +17,25 @@ const LandingPage = () => {
   }, []);
 
 
-//   const handleLogin = () => {
-//   // เพิ่ม redirect_uri parameter
-//   const redirectUri = encodeURIComponent(`${window.location.origin}/auth/callback`);
-//   const loginUrl = `${keycloakLoginUrl}?redirect_uri=${redirectUri}`;
-  
-//   console.log("Redirecting to:", loginUrl);
-//   window.location.href = loginUrl;
-// };
-const handleLogin = () => {
+  //   const handleLogin = () => {
+  //   // เพิ่ม redirect_uri parameter
+  //   const redirectUri = encodeURIComponent(`${window.location.origin}/auth/callback`);
+  //   const loginUrl = `${keycloakLoginUrl}?redirect_uri=${redirectUri}`;
+
+  //   console.log("Redirecting to:", loginUrl);
+  //   window.location.href = loginUrl;
+  // };
+  const handleLogin = () => {
     // ตอนนี้ให้ไป dashboard เลย ไม่ต้องใช้ Keycloak จริง
     // window.location.href = keycloakLoginUrl;
-    
+
     // เซ็ต dummy token
-<<<<<<< Updated upstream
-    Cookies.set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3ODMsImVtcGxveWVlSWQiOiI1MTIzMjUiLCJ0aXRsZSI6IuC4meC4suC4oiIsImZpcnN0TmFtZSI6IuC4iuC4seC4iuC4nuC4pSIsImxhc3ROYW1lIjoi4LiK4Li54Lin4LiH4Lio4LmM4Lin4Li44LiS4Li0IiwicG9zaXRpb24iOiLguJ7guIrguIcuMyjguK7guKUpIiwiYnVzaW5lc3NBcmVhIjoiSDA5MSIsImJ1c2luZXNzQXJlYU5hbWUiOiLguIHguJ_guK0u4LmB4LiB4Lil4LiHIiwiZGVwdENoYW5nZUNvZGUiOiI0MzAyNTIxMDIwMDAyMDAiLCJwb3NpdGlvbldpdGhEZXB0TmFtZSI6IiIsImlzcyI6Imh0dHBzOi8vYXBpLWNlYy1kZXYucGVhLmNvLnRoIiwic3ViIjoiNTEyMzI1IiwiYXVkIjpbInBlYS1jbWNkIl0sImV4cCI6MTc2Mzc1MjE5MiwiaWF0IjoxNzYzNzM3NzkyLCJqdGkiOiJkNGc4MWc1aWVicGo5dTZkbmg5MCJ9.jqoD2BGcldajbt1OXs-XwtdvqRjyr74HKh9BLtXoaJU", {
-=======
-    Cookies.set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3ODMsImVtcGxveWVlSWQiOiI1MTIzMjUiLCJ0aXRsZSI6IuC4meC4suC4oiIsImZpcnN0TmFtZSI6IuC4iuC4seC4iuC4nuC4pSIsImxhc3ROYW1lIjoi4LiK4Li54Lin4LiH4Lio4LmM4Lin4Li44LiS4Li0IiwicG9zaXRpb24iOiLguJ7guIrguIcuMyjguK7guKUpIiwiYnVzaW5lc3NBcmVhIjoiSDA5MSIsImJ1c2luZXNzQXJlYU5hbWUiOiLguIHguJ_guK0u4LmB4LiB4Lil4LiHIiwiZGVwdENoYW5nZUNvZGUiOiI0MzAyNTIxMDIwMDAyMDAiLCJwb3NpdGlvbldpdGhEZXB0TmFtZSI6IiIsImlzcyI6Imh0dHBzOi8vYXBpLWNlYy1kZXYucGVhLmNvLnRoIiwic3ViIjoiNTEyMzI1IiwiYXVkIjpbInBlYS1jbWNkIl0sImV4cCI6MTc2NDA3MDIzMywiaWF0IjoxNzY0MDU1ODMzLCJqdGkiOiJkNGlsbTZiOGxkYmVpdWowMWhwMCJ9.EwFFUWUNTI_DlDAQRk4GksT6jI2mo1PAVC9vxIbQlnc", {
->>>>>>> Stashed changes
+    Cookies.set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3NzUsImVtcGxveWVlSWQiOiI5MDExMDY1IiwidGl0bGUiOiLguJnguLLguKIiLCJmaXJzdE5hbWUiOiLguJjguJnguIHguKTguJUiLCJsYXN0TmFtZSI6IuC4nuC4tOC4oeC4nuC5jOC4meC5ieC4reC4oiIsInBvc2l0aW9uIjoi4LiK4Lia4LiELiIsImJ1c2luZXNzQXJlYSI6IkkwNzIiLCJidXNpbmVzc0FyZWFOYW1lIjoi4LiB4Lif4LiqLuC4quC4reC4h-C4nuC4teC5iOC4meC5ieC4reC4hyIsImRlcHRDaGFuZ2VDb2RlIjoiNDMwMzcwNTAxMDEwNDAwIiwicG9zaXRpb25XaXRoRGVwdE5hbWUiOiIiLCJpc3MiOiJodHRwczovL2FwaS1jZWMtZGV2LnBlYS5jby50aCIsInN1YiI6IjkwMTEwNjUiLCJhdWQiOlsicGVhLWNtY2QiXSwiZXhwIjoxNzY0MDcyNzc5LCJpYXQiOjE3NjQwNTgzNzksImp0aSI6ImQ0aW1hMnI4bGRiZWl1ajAxaHEwIn0.rnykjnJQfbe-RnPH0pazvnGfN8N1VxdJMQT-WIXY3tY", {
+
       path: "/",
       expires: 1 / 24, // 1 ชั่วโมง
     });
-    
+
     // ไป dashboard
     router.push("/management");
   };
@@ -46,13 +43,10 @@ const handleLogin = () => {
   useEffect(() => {
     const token = searchParams.get("token");
     const code = searchParams.get("code"); // Keycloak returns 'code' parameter
-    
+
     if (token) {
-<<<<<<< Updated upstream
-      Cookies.set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3ODMsImVtcGxveWVlSWQiOiI1MTIzMjUiLCJ0aXRsZSI6IuC4meC4suC4oiIsImZpcnN0TmFtZSI6IuC4iuC4seC4iuC4nuC4pSIsImxhc3ROYW1lIjoi4LiK4Li54Lin4LiH4Lio4LmM4Lin4Li44LiS4Li0IiwicG9zaXRpb24iOiLguJ7guIrguIcuMyjguK7guKUpIiwiYnVzaW5lc3NBcmVhIjoiSDA5MSIsImJ1c2luZXNzQXJlYU5hbWUiOiLguIHguJ_guK0u4LmB4LiB4Lil4LiHIiwiZGVwdENoYW5nZUNvZGUiOiI0MzAyNTIxMDIwMDAyMDAiLCJwb3NpdGlvbldpdGhEZXB0TmFtZSI6IiIsImlzcyI6Imh0dHBzOi8vYXBpLWNlYy1kZXYucGVhLmNvLnRoIiwic3ViIjoiNTEyMzI1IiwiYXVkIjpbInBlYS1jbWNkIl0sImV4cCI6MTc2Mzc1MDM4MiwiaWF0IjoxNzYzNzM1OTgyLCJqdGkiOiJkNGc3amJsaWVicGo5dTZkbmg4MCJ9.rWXyvPO8T9lgTVm4LZNF8kzeIlPdGlN3yZL12YSQvVQ", {
-=======
-      Cookies.set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3ODMsImVtcGxveWVlSWQiOiI1MTIzMjUiLCJ0aXRsZSI6IuC4meC4suC4oiIsImZpcnN0TmFtZSI6IuC4iuC4seC4iuC4nuC4pSIsImxhc3ROYW1lIjoi4LiK4Li54Lin4LiH4Lio4LmM4Lin4Li44LiS4Li0IiwicG9zaXRpb24iOiLguJ7guIrguIcuMyjguK7guKUpIiwiYnVzaW5lc3NBcmVhIjoiSDA5MSIsImJ1c2luZXNzQXJlYU5hbWUiOiLguIHguJ_guK0u4LmB4LiB4Lil4LiHIiwiZGVwdENoYW5nZUNvZGUiOiI0MzAyNTIxMDIwMDAyMDAiLCJwb3NpdGlvbldpdGhEZXB0TmFtZSI6IiIsImlzcyI6Imh0dHBzOi8vYXBpLWNlYy1kZXYucGVhLmNvLnRoIiwic3ViIjoiNTEyMzI1IiwiYXVkIjpbInBlYS1jbWNkIl0sImV4cCI6MTc2NDA3MDIzMywiaWF0IjoxNzY0MDU1ODMzLCJqdGkiOiJkNGlsbTZiOGxkYmVpdWowMWhwMCJ9.EwFFUWUNTI_DlDAQRk4GksT6jI2mo1PAVC9vxIbQlnc", {
->>>>>>> Stashed changes
+      Cookies.set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3NzUsImVtcGxveWVlSWQiOiI5MDExMDY1IiwidGl0bGUiOiLguJnguLLguKIiLCJmaXJzdE5hbWUiOiLguJjguJnguIHguKTguJUiLCJsYXN0TmFtZSI6IuC4nuC4tOC4oeC4nuC5jOC4meC5ieC4reC4oiIsInBvc2l0aW9uIjoi4LiK4Lia4LiELiIsImJ1c2luZXNzQXJlYSI6IkkwNzIiLCJidXNpbmVzc0FyZWFOYW1lIjoi4LiB4Lif4LiqLuC4quC4reC4h-C4nuC4teC5iOC4meC5ieC4reC4hyIsImRlcHRDaGFuZ2VDb2RlIjoiNDMwMzcwNTAxMDEwNDAwIiwicG9zaXRpb25XaXRoRGVwdE5hbWUiOiIiLCJpc3MiOiJodHRwczovL2FwaS1jZWMtZGV2LnBlYS5jby50aCIsInN1YiI6IjkwMTEwNjUiLCJhdWQiOlsicGVhLWNtY2QiXSwiZXhwIjoxNzY0MDcyNzc5LCJpYXQiOjE3NjQwNTgzNzksImp0aSI6ImQ0aW1hMnI4bGRiZWl1ajAxaHEwIn0.rnykjnJQfbe-RnPH0pazvnGfN8N1VxdJMQT-WIXY3tY", {
+
         path: "/",
         expires: 1 / 24, // 1 ชั่วโมงeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3ODMsImVtcGxveWVlSWQiOiI1MTIzMjUiLCJ0aXRsZSI6IuC4meC4suC4oiIsImZpcnN0TmFtZSI6IuC4iuC4seC4iuC4nuC4pSIsImxhc3ROYW1lIjoi4LiK4Li54Lin4LiH4Lio4LmM4Lin4Li44LiS4Li0IiwicG9zaXRpb24iOiLguJ7guIrguIcuMyjguK7guKUpIiwiYnVzaW5lc3NBcmVhIjoiSDA5MSIsImJ1c2luZXNzQXJlYU5hbWUiOiLguIHguJ_guK0u4LmB4LiB4Lil4LiHIiwiZGVwdENoYW5nZUNvZGUiOiI0MzAyNTIxMDIwMDAyMDAiLCJwb3NpdGlvbldpdGhEZXB0TmFtZSI6IiIsImlzcyI6Imh0dHBzOi8vYXBpLWNlYy1kZXYucGVhLmNvLnRoIiwic3ViIjoiNTEyMzI1IiwiYXVkIjpbInBlYS1jbWNkIl0sImV4cCI6MTc2MzY2NjMyMCwiaWF0IjoxNzYzNjUxOTIwLCJqdGkiOiJkNGZqMmsxYWMycGpvZ2lvcWNmZyJ9.Tsaic4RtUi5S7yxUw9zxX6XIIUBU5IzfZgfdz-4fdK8
       });
@@ -67,14 +61,16 @@ const handleLogin = () => {
       // Handle Keycloak authorization code
       // You might want to exchange this code for a token
       console.log("Authorization code received:", code);
-      
-      console.log("Token",token)
+
+      console.log("Token", token)
       // For now, redirect to dashboard
       setTimeout(() => {
         router.push("/dashboard");
       }, 100);
     } else {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 0);
     }
   }, [searchParams, router]);
 
@@ -128,7 +124,7 @@ const handleLogin = () => {
           className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 md:py-4 md:px-8 rounded-lg mt-8 flex items-center space-x-2 transition text-sm md:text-base"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
           </svg>
           <span>เข้าสู่ระบบด้วย Keycloak</span>
         </button>

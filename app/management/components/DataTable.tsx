@@ -17,9 +17,11 @@ interface DataTableProps {
   loading: boolean;
   filters: TableFilters;
   onFilterChange: (filters: TableFilters) => void;
+  page: number;
+  itemsPerPage: number;
 }
 
-export default function DataTable({ data, loading, filters, onFilterChange }: DataTableProps) {
+export default function DataTable({ data, loading, filters, onFilterChange, page, itemsPerPage }: DataTableProps) {
   const router = useRouter();
 
   const handleInputChange = (field: string, value: string) => {
@@ -32,6 +34,9 @@ export default function DataTable({ data, loading, filters, onFilterChange }: Da
   const handleRowClick = (itemId: string) => {
     router.push(`/management/constructions/${itemId}`);
   };
+
+  const currentPage = page || 1;
+  const currentItemsPerPage = itemsPerPage || 10;
 
   if (loading) {
     return (
@@ -104,10 +109,11 @@ export default function DataTable({ data, loading, filters, onFilterChange }: Da
                 className="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-white"
               >
                 <option value="">ทั้งหมด</option>
-                <option value="0">เชื่อมประมาณการ</option>
-                <option value="1">กำลังดำเนินการ</option>
-                <option value="2">ตรวจสอบผ่าน</option>
-                <option value="3">ตรวจสอบไม่ผ่าน</option>
+                <option value="UNLINKED">เชื่อมประมาณการ</option>
+                <option value="ADDED">ยังไม่เชื่อมประมาณการ</option>
+                <option value="ACTIVE">กำลังดำเนินการ</option>
+                <option value="COMPLETED">ตรวจสอบผ่าน</option>
+                <option value="FAILED">ตรวจสอบไม่ผ่าน</option>
               </select>
             </th>
             <th className="py-2 px-4">
@@ -119,37 +125,34 @@ export default function DataTable({ data, loading, filters, onFilterChange }: Da
         <tbody>
           {Array.isArray(data) && data.length > 0 ? (
             data.map((item, index) => (
-              <tr 
-                key={item.id} 
+              <tr
+                key={item.id}
                 className="border-b border-gray-100 hover:bg-purple-50 cursor-pointer transition-colors"
                 onClick={() => handleRowClick(item.id)}
               >
-                <td className="py-4 px-4 text-gray-900">{index + 1}</td>
+                <td className="py-4 px-4 text-gray-900">{(currentPage - 1) * currentItemsPerPage + index + 1}</td>
                 <td className="py-4 px-4 text-gray-900">{item.wbs}</td>
                 <td className="py-4 px-4 text-gray-900">{item.jobName}</td>
                 <td className="py-4 px-4 text-gray-600">
-                  <div className="flex items-center gap-2">
-                    {/* <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center"> */}
-                      {/* <span className="text-xs text-gray-600">👤</span> */}
-                    {/* </div> */}
-                    {item.supervisor ? item.supervisor : "ไม่มีช่างควบคุมงาน"}
-                  </div>
+                  {item.supervisor ? item.supervisor : "ไม่มีช่างควบคุมงาน"}
                 </td>
                 <td className="py-4 px-4 text-gray-900">
-                  {item.chairman && item.firstCommittee && item.secondCommittee ? item.chairman && item.firstCommittee && item.secondCommittee : "ไม่มีคณะกรรมการ"}
-                  </td>
+                  {(item.chairman || item.firstCommittee || item.secondCommittee)
+                    ? `${item.chairman || ''} ${item.firstCommittee || ''} ${item.secondCommittee || ''}`.trim()
+                    : "ไม่มีคณะกรรมการ"}
+                </td>
                 <td className="py-4 px-4">
                   <StatusButton status={item.jobStatus} />
                 </td>
-                <td 
-                  className="py-4 px-4" 
+                <td
+                  className="py-4 px-4"
                   onClick={(e) => {
                     e.stopPropagation();
                   }}
                 >
                   <ActionMenu
                     id={item.id}
-                    status={Number(item.jobStatus)}
+                    status={String(item.jobStatus)}
                     onEdit={() => console.log(`แก้ไข ${item.jobName}`)}
                     onReset={() => console.log(`รีเซ็ต ${item.jobName}`)}
                   />

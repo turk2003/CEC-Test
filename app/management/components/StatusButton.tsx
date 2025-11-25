@@ -5,7 +5,6 @@ interface StatusButtonProps {
 }
 
 export default function StatusButton({ status }: StatusButtonProps) {
-  console.log('StatusButton received status:', status);
   let statusStr = "";
 
   const statusMap: Record<string, string> = {

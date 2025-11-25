@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 interface ActionMenuProps {
   id: string;
-  status: number;
+  status: string;
   onEdit?: () => void;
   onReset?: () => void;
 }
@@ -13,7 +13,7 @@ interface ActionMenuProps {
 export default function ActionMenu({ id, status, onEdit, onReset }: ActionMenuProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  const isDisabled = status === 3;
+  const isDisabled = status === "UNLINKED";
 
   const handleEdit = () => {
     setOpen(false);
