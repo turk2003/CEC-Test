@@ -83,6 +83,7 @@ const LandingPage = () => {
   }
 
   return (
+    
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-gray-100">
       {/* Left Section (Image) */}
       <div className="relative w-full h-60 lg:h-auto lg:w-1/2">

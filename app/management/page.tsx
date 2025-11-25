@@ -1,6 +1,6 @@
 "use client";
 import Cookies from "js-cookie";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { DataItem } from "@/types";
 import api from "@/lib/api";
 import DataTable from "./components/DataTable";
@@ -22,37 +22,71 @@ export default function ManagementPage() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await api.get("/api/v3/jobs", {
-          params: {
-            page,
-            limit: itemsPerPage,
-            // TODO: add filters params if API supports
-          },
-        });
+  // ฟังก์ชันสำหรับเรียก API พร้อมกับ debounce
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      // สร้าง parameters สำหรับ API
+      const params: any = {
+        page,
+        limit: itemsPerPage,
+        all: activeTab === 'all', // ส่ง boolean สำหรับการแสดงข้อมูลทั้งหมดหรือไม่
+      };
 
-        const raw = response.data;
-
-        const arr = raw.data || [];
-        const total = raw.total || 0;
-
-        setData(arr);
-        setTotalPages(Math.ceil(total / itemsPerPage));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
+      // เพิ่ม filter parameters เฉพาะที่มีค่า
+      if (filters.wbs.trim()) {
+        params.wbs = filters.wbs.trim();
       }
-    };
+      
+      if (filters.search.trim()) {
+        params.jobName = filters.search.trim();
+      }
+      
+      if (filters.supervisor.trim()) {
+        params.supervisor = filters.supervisor.trim();
+      }
+      
+      if (filters.committee.trim()) {
+        params.committees = filters.committee.trim();
+      }
+      
+      if (filters.status) {
+        params.jobStatus = filters.status;
+      }
 
+      console.log('API Parameters:', params); // สำหรับ debug
+
+      const response = await api.get("/api/v3/jobs", { params });
+
+      const raw = response.data;
+      const arr = raw.data || [];
+      const total = raw.total || 0;
+
+      setData(arr);
+      setTotalPages(Math.ceil(total / itemsPerPage));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      // แสดงข้อความแจ้งเตือนเมื่อเกิดข้อผิดพลาด
+      setData([]);
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, itemsPerPage, filters, activeTab]);
+
+  // เรียก fetchData เมื่อ dependencies เปลี่ยน
+  useEffect(() => {
     fetchData();
-  }, [page, itemsPerPage]);
+  }, [fetchData]);
 
   const handleFilterChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
+    setPage(1); // รีเซ็ตไปหน้าแรกเมื่อมีการกรอง
+  };
+
+  const handleTabChange = (tab: "all" | "pending") => {
+    setActiveTab(tab);
+    setPage(1); // รีเซ็ตไปหน้าแรกเมื่อเปลี่ยน tab
   };
 
   return (
@@ -66,12 +100,12 @@ export default function ManagementPage() {
       </div>
       <div className="bg-white p-6 rounded-lg shadow">
         {/* Tabs */}
-        {/* <TabSection
+        <TabSection
           activeTab={activeTab}
-          onTabChange={setActiveTab}
+          onTabChange={handleTabChange}
           allCount={data.length}
-          pendingCount={data.filter((item) => item.status !== 2).length}
-        /> */}
+          pendingCount={data.filter((item) => item.jobStatus !== "COMPLETED").length}
+        />
 
         {/* Data Table with embedded filters */}
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
