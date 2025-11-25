@@ -1,10 +1,12 @@
 export type DataItem = {
   id: string;
   wbs: string;
-  con_name: string;
-  con_sup: string;
-  board: string;
-  status: string | number;
+  jobName: string;
+  supervisor: string;
+  chairman: string;
+  firstCommittee: string;
+  secondCommittee:string
+  jobStatus: string | number;
 };
 
 export type CommitteeMember = {

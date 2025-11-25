@@ -53,8 +53,8 @@ export default function ConstructionDetailsSection({
           </label>
           <input
             type="text"
-            value={formData.con_name || ""}
-            onChange={(e) => onFieldChange?.("con_name", e.target.value)}
+            value={formData.jobName || ""}
+            onChange={(e) => onFieldChange?.("jobName", e.target.value)}
             className={readOnlyInputClass}
             placeholder="กรอกชื่องาน"
             disabled

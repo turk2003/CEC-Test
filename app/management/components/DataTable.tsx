@@ -1,23 +1,27 @@
 import React from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { DataItem } from "@/types";
 import StatusButton from "./StatusButton";
 import ActionMenu from "./ActionMenu";
 
+type TableFilters = {
+  search: string;
+  wbs: string;
+  supervisor: string;
+  committee: string;
+  status: string;
+};
+
 interface DataTableProps {
   data: DataItem[];
   loading: boolean;
-  filters: {
-    search: string;
-    wbs: string;
-    supervisor: string;
-    committee: string;
-    status: string;
-  };
-  onFilterChange: (filters: any) => void;
+  filters: TableFilters;
+  onFilterChange: (filters: TableFilters) => void;
 }
 
 export default function DataTable({ data, loading, filters, onFilterChange }: DataTableProps) {
+  const router = useRouter();
+
   const handleInputChange = (field: string, value: string) => {
     onFilterChange({
       ...filters,
@@ -26,8 +30,7 @@ export default function DataTable({ data, loading, filters, onFilterChange }: Da
   };
 
   const handleRowClick = (itemId: string) => {
-    // Navigate to construction detail page
-    window.location.href = `/management/constructions/${itemId}`;
+    router.push(`/management/constructions/${itemId}`);
   };
 
   if (loading) {
@@ -114,13 +117,7 @@ export default function DataTable({ data, loading, filters, onFilterChange }: Da
         </thead>
 
         <tbody>
-          {data.length === 0 ? (
-            <tr>
-              <td colSpan={7} className="text-center py-8 text-gray-500">
-                ไม่มีข้อมูล
-              </td>
-            </tr>
-          ) : (
+          {Array.isArray(data) && data.length > 0 ? (
             data.map((item, index) => (
               <tr 
                 key={item.id} 
@@ -129,34 +126,42 @@ export default function DataTable({ data, loading, filters, onFilterChange }: Da
               >
                 <td className="py-4 px-4 text-gray-900">{index + 1}</td>
                 <td className="py-4 px-4 text-gray-900">{item.wbs}</td>
-                <td className="py-4 px-4 text-gray-900">{item.con_name}</td>
+                <td className="py-4 px-4 text-gray-900">{item.jobName}</td>
                 <td className="py-4 px-4 text-gray-600">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                      <span className="text-xs text-gray-600">👤</span>
-                    </div>
-                    {item.con_sup}
+                    {/* <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center"> */}
+                      {/* <span className="text-xs text-gray-600">👤</span> */}
+                    {/* </div> */}
+                    {item.supervisor ? item.supervisor : "ไม่มีช่างควบคุมงาน"}
                   </div>
                 </td>
-                <td className="py-4 px-4 text-gray-900">{item.board}</td>
+                <td className="py-4 px-4 text-gray-900">
+                  {item.chairman && item.firstCommittee && item.secondCommittee ? item.chairman && item.firstCommittee && item.secondCommittee : "ไม่มีคณะกรรมการ"}
+                  </td>
                 <td className="py-4 px-4">
-                  <StatusButton status={item.status} />
+                  <StatusButton status={item.jobStatus} />
                 </td>
                 <td 
                   className="py-4 px-4" 
                   onClick={(e) => {
-                    e.stopPropagation(); // ป้องกันไม่ให้ไปหน้า construction
+                    e.stopPropagation();
                   }}
                 >
-                  <ActionMenu 
+                  <ActionMenu
                     id={item.id}
-                    status={Number(item.status)} 
-                    onEdit={() => console.log(`แก้ไข ${item.con_name}`)}
-                    onReset={() => console.log(`รีเซ็ต ${item.con_name}`)}
+                    status={Number(item.jobStatus)}
+                    onEdit={() => console.log(`แก้ไข ${item.jobName}`)}
+                    onReset={() => console.log(`รีเซ็ต ${item.jobName}`)}
                   />
                 </td>
               </tr>
             ))
+          ) : (
+            <tr>
+              <td colSpan={7} className="text-center py-8 text-gray-500">
+                ไม่มีข้อมูล
+              </td>
+            </tr>
           )}
         </tbody>
       </table>

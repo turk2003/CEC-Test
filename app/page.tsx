@@ -30,7 +30,11 @@ const handleLogin = () => {
     // window.location.href = keycloakLoginUrl;
     
     // เซ็ต dummy token
+<<<<<<< Updated upstream
     Cookies.set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3ODMsImVtcGxveWVlSWQiOiI1MTIzMjUiLCJ0aXRsZSI6IuC4meC4suC4oiIsImZpcnN0TmFtZSI6IuC4iuC4seC4iuC4nuC4pSIsImxhc3ROYW1lIjoi4LiK4Li54Lin4LiH4Lio4LmM4Lin4Li44LiS4Li0IiwicG9zaXRpb24iOiLguJ7guIrguIcuMyjguK7guKUpIiwiYnVzaW5lc3NBcmVhIjoiSDA5MSIsImJ1c2luZXNzQXJlYU5hbWUiOiLguIHguJ_guK0u4LmB4LiB4Lil4LiHIiwiZGVwdENoYW5nZUNvZGUiOiI0MzAyNTIxMDIwMDAyMDAiLCJwb3NpdGlvbldpdGhEZXB0TmFtZSI6IiIsImlzcyI6Imh0dHBzOi8vYXBpLWNlYy1kZXYucGVhLmNvLnRoIiwic3ViIjoiNTEyMzI1IiwiYXVkIjpbInBlYS1jbWNkIl0sImV4cCI6MTc2Mzc1MjE5MiwiaWF0IjoxNzYzNzM3NzkyLCJqdGkiOiJkNGc4MWc1aWVicGo5dTZkbmg5MCJ9.jqoD2BGcldajbt1OXs-XwtdvqRjyr74HKh9BLtXoaJU", {
+=======
+    Cookies.set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3ODMsImVtcGxveWVlSWQiOiI1MTIzMjUiLCJ0aXRsZSI6IuC4meC4suC4oiIsImZpcnN0TmFtZSI6IuC4iuC4seC4iuC4nuC4pSIsImxhc3ROYW1lIjoi4LiK4Li54Lin4LiH4Lio4LmM4Lin4Li44LiS4Li0IiwicG9zaXRpb24iOiLguJ7guIrguIcuMyjguK7guKUpIiwiYnVzaW5lc3NBcmVhIjoiSDA5MSIsImJ1c2luZXNzQXJlYU5hbWUiOiLguIHguJ_guK0u4LmB4LiB4Lil4LiHIiwiZGVwdENoYW5nZUNvZGUiOiI0MzAyNTIxMDIwMDAyMDAiLCJwb3NpdGlvbldpdGhEZXB0TmFtZSI6IiIsImlzcyI6Imh0dHBzOi8vYXBpLWNlYy1kZXYucGVhLmNvLnRoIiwic3ViIjoiNTEyMzI1IiwiYXVkIjpbInBlYS1jbWNkIl0sImV4cCI6MTc2NDA3MDIzMywiaWF0IjoxNzY0MDU1ODMzLCJqdGkiOiJkNGlsbTZiOGxkYmVpdWowMWhwMCJ9.EwFFUWUNTI_DlDAQRk4GksT6jI2mo1PAVC9vxIbQlnc", {
+>>>>>>> Stashed changes
       path: "/",
       expires: 1 / 24, // 1 ชั่วโมง
     });
@@ -44,9 +48,13 @@ const handleLogin = () => {
     const code = searchParams.get("code"); // Keycloak returns 'code' parameter
     
     if (token) {
+<<<<<<< Updated upstream
       Cookies.set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3ODMsImVtcGxveWVlSWQiOiI1MTIzMjUiLCJ0aXRsZSI6IuC4meC4suC4oiIsImZpcnN0TmFtZSI6IuC4iuC4seC4iuC4nuC4pSIsImxhc3ROYW1lIjoi4LiK4Li54Lin4LiH4Lio4LmM4Lin4Li44LiS4Li0IiwicG9zaXRpb24iOiLguJ7guIrguIcuMyjguK7guKUpIiwiYnVzaW5lc3NBcmVhIjoiSDA5MSIsImJ1c2luZXNzQXJlYU5hbWUiOiLguIHguJ_guK0u4LmB4LiB4Lil4LiHIiwiZGVwdENoYW5nZUNvZGUiOiI0MzAyNTIxMDIwMDAyMDAiLCJwb3NpdGlvbldpdGhEZXB0TmFtZSI6IiIsImlzcyI6Imh0dHBzOi8vYXBpLWNlYy1kZXYucGVhLmNvLnRoIiwic3ViIjoiNTEyMzI1IiwiYXVkIjpbInBlYS1jbWNkIl0sImV4cCI6MTc2Mzc1MDM4MiwiaWF0IjoxNzYzNzM1OTgyLCJqdGkiOiJkNGc3amJsaWVicGo5dTZkbmg4MCJ9.rWXyvPO8T9lgTVm4LZNF8kzeIlPdGlN3yZL12YSQvVQ", {
+=======
+      Cookies.set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3ODMsImVtcGxveWVlSWQiOiI1MTIzMjUiLCJ0aXRsZSI6IuC4meC4suC4oiIsImZpcnN0TmFtZSI6IuC4iuC4seC4iuC4nuC4pSIsImxhc3ROYW1lIjoi4LiK4Li54Lin4LiH4Lio4LmM4Lin4Li44LiS4Li0IiwicG9zaXRpb24iOiLguJ7guIrguIcuMyjguK7guKUpIiwiYnVzaW5lc3NBcmVhIjoiSDA5MSIsImJ1c2luZXNzQXJlYU5hbWUiOiLguIHguJ_guK0u4LmB4LiB4Lil4LiHIiwiZGVwdENoYW5nZUNvZGUiOiI0MzAyNTIxMDIwMDAyMDAiLCJwb3NpdGlvbldpdGhEZXB0TmFtZSI6IiIsImlzcyI6Imh0dHBzOi8vYXBpLWNlYy1kZXYucGVhLmNvLnRoIiwic3ViIjoiNTEyMzI1IiwiYXVkIjpbInBlYS1jbWNkIl0sImV4cCI6MTc2NDA3MDIzMywiaWF0IjoxNzY0MDU1ODMzLCJqdGkiOiJkNGlsbTZiOGxkYmVpdWowMWhwMCJ9.EwFFUWUNTI_DlDAQRk4GksT6jI2mo1PAVC9vxIbQlnc", {
+>>>>>>> Stashed changes
         path: "/",
-        expires: 1 / 24, // 1 ชั่วโมง
+        expires: 1 / 24, // 1 ชั่วโมงeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3ODMsImVtcGxveWVlSWQiOiI1MTIzMjUiLCJ0aXRsZSI6IuC4meC4suC4oiIsImZpcnN0TmFtZSI6IuC4iuC4seC4iuC4nuC4pSIsImxhc3ROYW1lIjoi4LiK4Li54Lin4LiH4Lio4LmM4Lin4Li44LiS4Li0IiwicG9zaXRpb24iOiLguJ7guIrguIcuMyjguK7guKUpIiwiYnVzaW5lc3NBcmVhIjoiSDA5MSIsImJ1c2luZXNzQXJlYU5hbWUiOiLguIHguJ_guK0u4LmB4LiB4Lil4LiHIiwiZGVwdENoYW5nZUNvZGUiOiI0MzAyNTIxMDIwMDAyMDAiLCJwb3NpdGlvbldpdGhEZXB0TmFtZSI6IiIsImlzcyI6Imh0dHBzOi8vYXBpLWNlYy1kZXYucGVhLmNvLnRoIiwic3ViIjoiNTEyMzI1IiwiYXVkIjpbInBlYS1jbWNkIl0sImV4cCI6MTc2MzY2NjMyMCwiaWF0IjoxNzYzNjUxOTIwLCJqdGkiOiJkNGZqMmsxYWMycGpvZ2lvcWNmZyJ9.Tsaic4RtUi5S7yxUw9zxX6XIIUBU5IzfZgfdz-4fdK8
       });
 
       const cleanUrl = window.location.pathname;
@@ -60,6 +68,7 @@ const handleLogin = () => {
       // You might want to exchange this code for a token
       console.log("Authorization code received:", code);
       
+      console.log("Token",token)
       // For now, redirect to dashboard
       setTimeout(() => {
         router.push("/dashboard");

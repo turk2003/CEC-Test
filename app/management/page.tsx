@@ -19,13 +19,22 @@ export default function ManagementPage() {
     committee: '',
     status: ''
   });
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await api.get('/list');
-        setData(response.data);
-        setFilteredData(response.data);
+        const response = await api.get('/api/v3/jobs');
+        const raw = response.data;
+        const arr =
+          Array.isArray(raw)
+            ? raw
+            : Array.isArray(raw?.data)
+              ? raw.data
+              : [];
+        setData(arr);
+        setFilteredData(arr);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -40,10 +49,17 @@ export default function ManagementPage() {
     const fetchData2 = async () => {
       
       try {
-       const response = await api.get('/api/v1/pea', {
-       
-      });
-        console.log('Fetched constructions:', response.data); 
+        const response = await api.get('/api/v3/jobs', {
+        
+        });
+        const raw = response.data;
+        const arr =
+          Array.isArray(raw)
+            ? raw
+            : Array.isArray(raw?.data)
+              ? raw.data
+              : [];
+        console.log('Fetched constructions:', arr); 
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -62,13 +78,13 @@ export default function ManagementPage() {
 
     // Tab filter
     if (activeTab === 'pending') {
-      filtered = filtered.filter(item => item.status !== 2);
+      filtered = filtered.filter(item => item.jobStatus !== 2);
     }
 
     // Apply filters
     if (filters.search) {
       filtered = filtered.filter(item => 
-        item.con_name.toLowerCase().includes(filters.search.toLowerCase())
+        item.jobName.toLowerCase().includes(filters.search.toLowerCase())
       );
     }
 
@@ -80,19 +96,19 @@ export default function ManagementPage() {
 
     if (filters.supervisor) {
       filtered = filtered.filter(item => 
-        item.con_sup.toLowerCase().includes(filters.supervisor.toLowerCase())
+        item.supervisor.toLowerCase().includes(filters.supervisor.toLowerCase())
       );
     }
 
     if (filters.committee) {
       filtered = filtered.filter(item => 
-        item.board.toLowerCase().includes(filters.committee.toLowerCase())
+        item.chairman.toLowerCase().includes(filters.committee.toLowerCase())
       );
     }
 
     if (filters.status) {
       filtered = filtered.filter(item => 
-        item.status.toString() === filters.status
+        item.jobStatus.toString() === filters.status
       );
     }
 
@@ -102,6 +118,12 @@ export default function ManagementPage() {
   const handleFilterChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
   };
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const paginatedData = filteredData.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
 
   return (
     <div className="p-6">
@@ -119,21 +141,107 @@ export default function ManagementPage() {
       <div className="bg-white p-6 rounded-lg shadow">
 
       {/* Tabs */}
-      <TabSection 
+      {/* <TabSection 
         activeTab={activeTab}
         onTabChange={setActiveTab}
         allCount={data.length}
         pendingCount={data.filter(item => item.status !== 2).length}
-      />
+      /> */}
 
       {/* Data Table with embedded filters */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <DataTable 
-          data={filteredData} 
+          data={paginatedData} 
           loading={loading}
           filters={filters}
           onFilterChange={handleFilterChange}
         />
+        <div className="flex justify-between items-center p-4 border-t">
+  <div className="flex items-center gap-2">
+
+    {/* First Page */}
+    <button
+      onClick={() => setPage(1)}
+      disabled={page === 1}
+      className="px-2 py-1 text-gray-600 disabled:opacity-30"
+    >
+      «
+    </button>
+
+    {/* Previous Page */}
+    <button
+      onClick={() => setPage((p) => Math.max(1, p - 1))}
+      disabled={page === 1}
+      className="px-2 py-1 text-gray-600 disabled:opacity-30"
+    >
+      ‹
+    </button>
+
+    {/* Page Numbers */}
+    {[...Array(totalPages)].map((_, i) => {
+      const pageNumber = i + 1;
+      if (
+        pageNumber === 1 ||
+        pageNumber === totalPages ||
+        Math.abs(pageNumber - page) <= 1
+      ) {
+        return (
+          <button
+            key={pageNumber}
+            onClick={() => setPage(pageNumber)}
+            className={`px-3 py-1 rounded ${
+              page === pageNumber
+                ? "bg-purple-600 text-white"
+                : "bg-white border text-gray-700"
+            }`}
+          >
+            {pageNumber}
+          </button>
+        );
+      }
+      if (pageNumber === page - 2 || pageNumber === page + 2) {
+        return (
+          <span key={pageNumber} className="px-2 text-gray-500">
+            …
+          </span>
+        );
+      }
+      return null;
+    })}
+
+    {/* Next Page */}
+    <button
+      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+      disabled={page === totalPages}
+      className="px-2 py-1 text-gray-600 disabled:opacity-30"
+    >
+      ›
+    </button>
+
+    {/* Last Page */}
+    <button
+      onClick={() => setPage(totalPages)}
+      disabled={page === totalPages}
+      className="px-2 py-1 text-gray-600 disabled:opacity-30"
+    >
+      »
+    </button>
+  </div>
+
+  {/* Items Per Page Dropdown */}
+  <select
+    value={itemsPerPage}
+    onChange={(e) => {
+      setPage(1);
+      setFilteredData(data);
+    }}
+    className="border px-2 py-1 rounded"
+  >
+    <option value={10}>10</option>
+    <option value={20}>20</option>
+    <option value={50}>50</option>
+  </select>
+</div>
       </div>
       </div>
     </div>

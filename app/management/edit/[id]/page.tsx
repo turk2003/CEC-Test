@@ -19,7 +19,7 @@ export default function EditPage() {
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState<Partial<DataItem>>({
         wbs: "",
-        con_name: "",
+        jobName: "",
         con_sup: "",
         board: "",
         status: 0,
