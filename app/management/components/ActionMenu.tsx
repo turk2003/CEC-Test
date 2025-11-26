@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface ActionMenuProps {
-  id: string;
+  id: number;
   status: string;
   onEdit?: () => void;
   onReset?: () => void;

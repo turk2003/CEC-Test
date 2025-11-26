@@ -27,26 +27,21 @@ export default function ManagementPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
 
-  // ...existing code...
 const fetchData = useCallback(async () => {
   setLoading(true);
   try {
     // สร้าง parameters สำหรับ API
     const params: any = {
       page,
-      limit: itemsPerPage,
+      limit: 10,
       all: activeTab === 'all',
     };
 
     // การจัดการ region และ business area filter
     if (selectedRegion && !selectedBusinessArea) {
-      // เลือกแค่เขต ไม่เลือกการไฟฟ้า - ส่ง deptArea เป็น region
       params.deptarea = selectedRegion;
-      console.log('กรองตาม deptArea (เขต):', selectedRegion);
     } else if (selectedBusinessArea) {
-      // เลือกการไฟฟ้าเฉพาะ - ส่ง ba
       params.ba = selectedBusinessArea;
-      console.log('กรองตาม ba (การไฟฟ้า):', selectedBusinessArea);
     }
     
     // เพิ่ม filter parameters อื่นๆ
@@ -70,24 +65,53 @@ const fetchData = useCallback(async () => {
       params.jobStatus = filters.status;
     }
 
-    console.log('Final API Parameters:', params);
+    console.log('API Request:', `/api/v3/jobs`, params);
 
-    const response = await api.get("/api/v3/jobs", { params });
-    console.log("/api/v3/jobs", { params })
-    console.log("API Response:", response.data);
+    // เพิ่ม timeout สำหรับ request นี้โดยเฉพาะ
+    const response = await api.get("/api/v3/jobs", { 
+      params,
+      timeout: 30000 // 30 วินาที
+    });
+    
+    // เช็คว่า response มีข้อมูลหรือไม่
+    if (!response.data) {
+      throw new Error('No data received from API');
+    }
 
     const raw = response.data;
-    const arr = raw.data || [];
-    const total = raw.total || 0;
+    console.log('Raw API Response:', raw);
 
-    console.log('จำนวนข้อมูลที่ได้:', arr.length);
-    console.log('Total จาก API:', total);
+    // ตรวจสอบ structure ของ response
+    if (typeof raw !== 'object') {
+      throw new Error('Invalid response format');
+    }
+
+    const arr = Array.isArray(raw.data) ? raw.data : [];
+    
+
+    console.log('Processed data:', { count: arr.length, total: raw. total });
 
     setData(arr);
-    setTotalPages(Math.ceil(total / itemsPerPage));
-    setTotalItems(total);
-  } catch (error) {
+    setTotalPages(Math.ceil(raw.total / itemsPerPage));
+    setTotalItems(raw.total);
+
+  } catch (error: any) {
     console.error("Error fetching data:", error);
+    
+    // จัดการ error แต่ละประเภท
+    if (error.code === 'ECONNABORTED') {
+      console.error('Request timeout - API ใช้เวลานานเกินไป');
+    } else if (error.response) {
+      console.error("Server Error:", {
+        status: error.response.status,
+        data: error.response.data
+      });
+    } else if (error.request) {
+      console.error('Network Error - ไม่สามารถเชื่อมต่อ API ได้');
+    } else {
+      console.error('Unknown Error:', error.message);
+    }
+    
     setData([]);
     setTotalPages(1);
     setTotalItems(0);
@@ -95,7 +119,6 @@ const fetchData = useCallback(async () => {
     setLoading(false);
   }
 }, [page, itemsPerPage, filters, activeTab, selectedRegion, selectedBusinessArea]);
-// ...existing code...
 
   // เรียก fetchData เมื่อ dependencies เปลี่ยน
   useEffect(() => {

@@ -50,7 +50,7 @@ export default function DataTable({ data, loading, filters, onFilterChange, page
     }, 500);
   }, [filters, onFilterChange]);
 
-  const handleRowClick = (itemId: string) => {
+    const handleRowClick = (itemId: number) => { // เปลี่ยนจาก string เป็น number
     router.push(`/management/constructions/${itemId}`);
   };
 
@@ -158,12 +158,18 @@ export default function DataTable({ data, loading, filters, onFilterChange, page
                 <td className="py-4 px-4 text-gray-900">{(currentPage - 1) * currentItemsPerPage + index + 1}</td>
                 <td className="py-4 px-4 text-gray-900 font-mono text-sm">{item.wbs}</td>
                 <td className="py-4 px-4 text-gray-900">{item.jobName}</td>
-                <td className="py-4 px-4 text-gray-600">
-                  {item.supervisor ? item.supervisor : "ไม่มีช่างควบคุมงาน"}
+                 <td className="py-4 px-4 text-gray-600">
+                  {item.supervisor 
+                    ? `${item.supervisor.title}${item.supervisor.firstName} ${item.supervisor.lastName}` 
+                    : "ไม่มีช่างควบคุมงาน"}
                 </td>
                 <td className="py-4 px-4 text-gray-900">
                   {(item.chairman || item.firstCommittee || item.secondCommittee)
-                    ? `${item.chairman || ''} ${item.firstCommittee || ''} ${item.secondCommittee || ''}`.trim()
+                    ? [
+                        item.chairman ? `${item.chairman.title}${item.chairman.firstName} ${item.chairman.lastName}` : '',
+                        item.firstCommittee ? `${item.firstCommittee.title}${item.firstCommittee.firstName} ${item.firstCommittee.lastName}` : '',
+                        item.secondCommittee ? `${item.secondCommittee.title}${item.secondCommittee.firstName} ${item.secondCommittee.lastName}` : ''
+                      ].filter(name => name).join(', ')
                     : "ไม่มีคณะกรรมการ"}
                 </td>
                 <td className="py-4 px-4">

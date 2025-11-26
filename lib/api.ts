@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 const api = axios.create({
   baseURL: 'https://api-cec-dev.pea.co.th',
   // baseURL: 'https://6916ccd6a7a34288a27e6818.mockapi.io/api/cpm/',
-  timeout: 10000,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
