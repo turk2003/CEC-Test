@@ -5,7 +5,6 @@ import { DataItem } from "@/types";
 import api from "@/lib/api";
 import DataTable from "./components/DataTable";
 import TabSection from "./components/TabSection";
-import axios from "axios";
 
 export default function ManagementPage() {
   const [data, setData] = useState<DataItem[]>([]);
@@ -18,61 +17,85 @@ export default function ManagementPage() {
     committee: "",
     status: "",
   });
+  
+  // เพิ่ม region filters
+  const [selectedRegion, setSelectedRegion] = useState("");
+  const [selectedBusinessArea, setSelectedBusinessArea] = useState("");
+  
   const [page, setPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
-  // ฟังก์ชันสำหรับเรียก API พร้อมกับ debounce
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      // สร้าง parameters สำหรับ API
-      const params: any = {
-        page,
-        limit: itemsPerPage,
-        all: activeTab === 'all', // ส่ง boolean สำหรับการแสดงข้อมูลทั้งหมดหรือไม่
-      };
+  // ...existing code...
+const fetchData = useCallback(async () => {
+  setLoading(true);
+  try {
+    // สร้าง parameters สำหรับ API
+    const params: any = {
+      page,
+      limit: itemsPerPage,
+      all: activeTab === 'all',
+    };
 
-      // เพิ่ม filter parameters เฉพาะที่มีค่า
-      if (filters.wbs.trim()) {
-        params.wbs = filters.wbs.trim();
-      }
-      
-      if (filters.search.trim()) {
-        params.jobName = filters.search.trim();
-      }
-      
-      if (filters.supervisor.trim()) {
-        params.supervisor = filters.supervisor.trim();
-      }
-      
-      if (filters.committee.trim()) {
-        params.committees = filters.committee.trim();
-      }
-      
-      if (filters.status) {
-        params.jobStatus = filters.status;
-      }
-
-      console.log('API Parameters:', params); // สำหรับ debug
-
-      const response = await api.get("/api/v3/jobs", { params });
-
-      const raw = response.data;
-      const arr = raw.data || [];
-      const total = raw.total || 0;
-
-      setData(arr);
-      setTotalPages(Math.ceil(total / itemsPerPage));
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      // แสดงข้อความแจ้งเตือนเมื่อเกิดข้อผิดพลาด
-      setData([]);
-      setTotalPages(1);
-    } finally {
-      setLoading(false);
+    // การจัดการ region และ business area filter
+    if (selectedRegion && !selectedBusinessArea) {
+      // เลือกแค่เขต ไม่เลือกการไฟฟ้า - ส่ง deptArea เป็น region
+      params.deptarea = selectedRegion;
+      console.log('กรองตาม deptArea (เขต):', selectedRegion);
+    } else if (selectedBusinessArea) {
+      // เลือกการไฟฟ้าเฉพาะ - ส่ง ba
+      params.ba = selectedBusinessArea;
+      console.log('กรองตาม ba (การไฟฟ้า):', selectedBusinessArea);
     }
-  }, [page, itemsPerPage, filters, activeTab]);
+    
+    // เพิ่ม filter parameters อื่นๆ
+    if (filters.wbs.trim()) {
+      params.wbs = filters.wbs.trim();
+    }
+    
+    if (filters.search.trim()) {
+      params.jobName = filters.search.trim();
+    }
+    
+    if (filters.supervisor.trim()) {
+      params.supervisor = filters.supervisor.trim();
+    }
+    
+    if (filters.committee.trim()) {
+      params.committees = filters.committee.trim();
+    }
+    
+    if (filters.status) {
+      params.jobStatus = filters.status;
+    }
+
+    console.log('Final API Parameters:', params);
+
+    const response = await api.get("/api/v3/jobs", { params });
+    console.log("/api/v3/jobs", { params })
+    console.log("API Response:", response.data);
+
+    const raw = response.data;
+    const arr = raw.data || [];
+    const total = raw.total || 0;
+
+    console.log('จำนวนข้อมูลที่ได้:', arr.length);
+    console.log('Total จาก API:', total);
+
+    setData(arr);
+    setTotalPages(Math.ceil(total / itemsPerPage));
+    setTotalItems(total);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    setData([]);
+    setTotalPages(1);
+    setTotalItems(0);
+  } finally {
+    setLoading(false);
+  }
+}, [page, itemsPerPage, filters, activeTab, selectedRegion, selectedBusinessArea]);
+// ...existing code...
 
   // เรียก fetchData เมื่อ dependencies เปลี่ยน
   useEffect(() => {
@@ -81,12 +104,23 @@ export default function ManagementPage() {
 
   const handleFilterChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
-    setPage(1); // รีเซ็ตไปหน้าแรกเมื่อมีการกรอง
+    setPage(1);
   };
 
   const handleTabChange = (tab: "all" | "pending") => {
     setActiveTab(tab);
-    setPage(1); // รีเซ็ตไปหน้าแรกเมื่อเปลี่ยน tab
+    setPage(1);
+  };
+
+  const handleRegionChange = (region: string, ba: string) => {
+    setSelectedRegion(region);
+    setSelectedBusinessArea(ba);
+    setPage(1);
+  };
+
+  const handleBusinessAreaChange = (ba: string) => {
+    setSelectedBusinessArea(ba);
+    setPage(1);
   };
 
   return (
@@ -95,19 +129,21 @@ export default function ManagementPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">จัดการงานก่อสร้าง</h1>
       </div>
-      <div className="mb-6 ml-1">
-        <h1 className="text-lg text-gray-900 mb-2">จัดการงานก่อสร้าง</h1>
-      </div>
+
       <div className="bg-white p-6 rounded-lg shadow">
-        {/* Tabs */}
+        {/* Tabs with Region Filters */}
         <TabSection
           activeTab={activeTab}
           onTabChange={handleTabChange}
-          allCount={data.length}
+          allCount={totalItems}
           pendingCount={data.filter((item) => item.jobStatus !== "COMPLETED").length}
+          selectedRegion={selectedRegion}
+          selectedBusinessArea={selectedBusinessArea}
+          onRegionChange={handleRegionChange}
+          onBusinessAreaChange={handleBusinessAreaChange}
         />
 
-        {/* Data Table with embedded filters */}
+        {/* Data Table */}
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           <DataTable
             data={data}
@@ -117,82 +153,66 @@ export default function ManagementPage() {
             page={page}
             itemsPerPage={itemsPerPage}
           />
-          <div className="flex justify-center items-center p-4 border-t gap-6">
+          
+          {/* Pagination */}
+          <div className="flex justify-between items-center p-4 border-t bg-gray-50">
+            <div className="text-sm text-gray-600">
+              แสดง {data.length} รายการ จากทั้งหมด {totalItems} รายการ
+              {totalPages > 1 && ` (หน้า ${page} จาก ${totalPages})`}
+            </div>
+            
             <div className="flex items-center gap-2">
-              {/* First Page */}
+              {/* Pagination buttons */}
               <button
                 onClick={() => setPage(1)}
-                disabled={page === 1}
-                className="px-2 py-1 text-gray-600 disabled:opacity-30"
+                disabled={page === 1 || loading}
+                className="px-3 py-1 text-sm text-gray-600 hover:text-purple-600 disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                «
+                «« แรก
               </button>
 
-              {/* Previous Page */}
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="px-2 py-1 text-gray-600 disabled:opacity-30"
+                disabled={page === 1 || loading}
+                className="px-3 py-1 text-sm text-gray-600 hover:text-purple-600 disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                ‹
+                ‹ ก่อนหน้า
               </button>
 
-              {/* Page Numbers */}
-              {[...Array(totalPages)].map((_, i) => {
-                const pageNumber = i + 1;
-                if (pageNumber === 1 || pageNumber === totalPages || Math.abs(pageNumber - page) <= 1) {
-                  return (
-                    <button
-                      key={pageNumber}
-                      onClick={() => setPage(pageNumber)}
-                      className={`px-3 py-1 rounded ${page === pageNumber ? "bg-purple-600 text-white" : "bg-white border text-gray-700"
-                        }`}
-                    >
-                      {pageNumber}
-                    </button>
-                  );
-                }
-                if (pageNumber === page - 2 || pageNumber === page + 2) {
-                  return (
-                    <span key={pageNumber} className="px-2 text-gray-500">
-                      …
-                    </span>
-                  );
-                }
-                return null;
-              })}
+              <span className="px-3 py-1 bg-purple-600 text-white rounded text-sm">
+                {page}
+              </span>
 
-              {/* Next Page */}
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="px-2 py-1 text-gray-600 disabled:opacity-30"
+                disabled={page === totalPages || loading}
+                className="px-3 py-1 text-sm text-gray-600 hover:text-purple-600 disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                ›
+                ถัดไป ›
               </button>
 
-              {/* Last Page */}
               <button
                 onClick={() => setPage(totalPages)}
-                disabled={page === totalPages}
-                className="px-2 py-1 text-gray-600 disabled:opacity-30"
+                disabled={page === totalPages || loading}
+                className="px-3 py-1 text-sm text-gray-600 hover:text-purple-600 disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                »
+                ท้าย »»
               </button>
             </div>
 
-            {/* Items Per Page Dropdown */}
             <select
               value={itemsPerPage}
               onChange={(e) => {
                 setItemsPerPage(Number(e.target.value));
                 setPage(1);
               }}
-              className="border px-2 py-1 rounded text-gray-700"
+              className="border border-gray-300 px-3 py-1 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-purple-500"
+              disabled={loading}
             >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
+              <option value={10}>10 รายการ</option>
+              <option value={20}>20 รายการ</option>
+              <option value={50}>50 รายการ</option>
+              <option value={100}>100 รายการ</option>
             </select>
           </div>
         </div>
