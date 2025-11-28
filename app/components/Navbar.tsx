@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
+import Cookies from "js-cookie";
+import { ssoLogoutUrl } from "@/service/index";
 
 interface NavbarProps {
   onToggleSidebar?: () => void;
@@ -23,6 +25,8 @@ interface UserData {
 const Navbar = ({ onToggleSidebar }: NavbarProps) => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const ssoLogoutUrl1 = `${ssoLogoutUrl}/${Cookies.get("token")}`;
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -40,12 +44,37 @@ const Navbar = ({ onToggleSidebar }: NavbarProps) => {
     fetchUserData();
   }, []);
 
-  // ฟังก์ชัน logout
-  const handleLogout = () => {
-    // ลบ token และ redirect
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  // ฟังก์ชัน logout ใหม่
+const handleLogout = async () => {
+  try {
+    setLoggingOut(true);
+
+    window.location.href = ssoLogoutUrl1;
+
+    // ลบ token และข้อมูลในเครื่อง
+    Cookies.remove("token", { path: "/" });
+    Cookies.remove("token", { path: "/management" });
+    Cookies.remove("token"); // ลบแบบไม่ระบุ path
+    
+    // ล้าง storage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    console.log('Redirecting to home...');
+   
+    
+  } catch (error) {
+    console.error('Error during logout:', error);
+    
+    // ถึงแม้จะ error ก็ยัง force logout
+    Cookies.remove("token", { path: "/" });
+    localStorage.clear();
+    sessionStorage.clear();
     window.location.href = "/";
-  };
+  } finally {
+    setLoggingOut(false);
+  }
+};
 
   return (
     <div className="bg-white border-b border-gray-200 px-6 py-4">
@@ -85,15 +114,13 @@ const Navbar = ({ onToggleSidebar }: NavbarProps) => {
                   {userData.title} {userData.firstName} {userData.lastName}
                 </div>
                 <div className="text-xs text-gray-500">
-                  {userData.position}
+                  {userData.position} ({userData.businessAreaName})
                 </div>
               </div>
               
               {/* Avatar */}
-              <div 
-                className={`w-8 h-8  bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold`}
-              >
-                
+              <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                {userData.firstName.charAt(0)}{userData.lastName.charAt(0)}
               </div>
             </>
           ) : (
@@ -113,14 +140,19 @@ const Navbar = ({ onToggleSidebar }: NavbarProps) => {
           {/* Logout Button */}
           <button 
             onClick={handleLogout}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            disabled={loggingOut}
+            className={`text-gray-400 hover:text-gray-600 transition-colors ${loggingOut ? 'opacity-50 cursor-not-allowed' : ''}`}
             title="ออกจากระบบ"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path fillRule="evenodd" clipRule="evenodd" d="M15 4V20H4L4 4L15 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M12.5 12H21.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M18.5 15L21.5 12L18.5 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            {loggingOut ? (
+              <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fillRule="evenodd" clipRule="evenodd" d="M15 4V20H4L4 4L15 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M12.5 12H21.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M18.5 15L21.5 12L18.5 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
           </button>
         </div>
       </div>

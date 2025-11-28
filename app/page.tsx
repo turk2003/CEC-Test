@@ -5,85 +5,106 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { ssoLoginUrl } from "@/service/index";
-// กำหนด Keycloak Login URL
-const keycloakLoginUrl = ssoLoginUrl;
-const LandingPage = () => {
+
+export default function LandingPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
 
+  // ตรวจสอบ token ใน URL และ cookies
   useEffect(() => {
-    console.log("keycloakLoginUrl", keycloakLoginUrl);
-  }, []);
+    const handleTokenFromUrl = () => {
+      const tokenFromUrl = searchParams.get("token");
+      const existingToken = Cookies.get("token");
 
+      console.log("Token from URL:", tokenFromUrl);
+      console.log("Existing token:", existingToken);
 
-  //   const handleLogin = () => {
-  //   // เพิ่ม redirect_uri parameter
-  //   const redirectUri = encodeURIComponent(`${window.location.origin}/auth/callback`);
-  //   const loginUrl = `${keycloakLoginUrl}?redirect_uri=${redirectUri}`;
+      // ถ้ามี token จาก URL
+      if (tokenFromUrl) {
+        try {
+          // ตรวจสอบว่า token เป็น JWT format ที่ถูกต้องหรือไม่
+          const tokenParts = tokenFromUrl.split('.');
+          if (tokenParts.length === 3) {
+            // เซ็ต token ใน cookies
+            Cookies.set("token", tokenFromUrl, {
+              path: "/",
+              expires: 1, // 1 วัน
+            });
 
-  //   console.log("Redirecting to:", loginUrl);
-  //   window.location.href = loginUrl;
-  // };
-  const handleLogin = () => {
-    // ตอนนี้ให้ไป dashboard เลย ไม่ต้องใช้ Keycloak จริง
-    // window.location.href = keycloakLoginUrl;
+            // ล้าง URL parameter
+            const cleanUrl = window.location.pathname;
+            window.history.replaceState(null, "", cleanUrl);
 
-    // เซ็ต dummy token
-    Cookies.set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3ODMsImVtcGxveWVlSWQiOiI1MTIzMjUiLCJ0aXRsZSI6IuC4meC4suC4oiIsImZpcnN0TmFtZSI6IuC4iuC4seC4iuC4nuC4pSIsImxhc3ROYW1lIjoi4LiK4Li54Lin4LiH4Lio4LmM4Lin4Li44LiS4Li0IiwicG9zaXRpb24iOiLguJ7guIrguIcuMyjguK7guKUpIiwiYnVzaW5lc3NBcmVhIjoiSDA5MSIsImJ1c2luZXNzQXJlYU5hbWUiOiLguIHguJ_guK0u4LmB4LiB4Lil4LiHIiwiZGVwdENoYW5nZUNvZGUiOiI0MzAyNTIxMDIwMDAyMDAiLCJwb3NpdGlvbldpdGhEZXB0TmFtZSI6IiIsImlzcyI6Imh0dHBzOi8vYXBpLWNlYy1kZXYucGVhLmNvLnRoIiwic3ViIjoiNTEyMzI1IiwiYXVkIjpbInBlYS1jbWNkIl0sImV4cCI6MTc2NDE3OTEyOSwiaWF0IjoxNzY0MTY0NzI5LCJqdGkiOiJkNGpnOHVmbGJrYTRjNm04dmozMCJ9.hd6LCWzoHRdP3ErfS47NM2YfWAwWuLQDMJPlrKCeroY", {
+            console.log("Token saved successfully, redirecting to management...");
+            
+            // รอสักครู่แล้ว redirect
+            setTimeout(() => {
+              router.push("/management");
+            }, 100);
+            
+            return;
+          } else {
+            console.error("Invalid token format received");
+          }
+        } catch (error) {
+          console.error("Error processing token:", error);
+        }
+      }
 
-      path: "/",
-      expires: 1 / 24, // 1 ชั่วโมง
-    });
-
-    // ไป dashboard
-    router.push("/management");
-  };
-
-  useEffect(() => {
-    const token = searchParams.get("token");
-    const code = searchParams.get("code"); // Keycloak returns 'code' parameter
-
-    if (token) {
-      Cookies.set("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3ODMsImVtcGxveWVlSWQiOiI1MTIzMjUiLCJ0aXRsZSI6IuC4meC4suC4oiIsImZpcnN0TmFtZSI6IuC4iuC4seC4iuC4nuC4pSIsImxhc3ROYW1lIjoi4LiK4Li54Lin4LiH4Lio4LmM4Lin4Li44LiS4Li0IiwicG9zaXRpb24iOiLguJ7guIrguIcuMyjguK7guKUpIiwiYnVzaW5lc3NBcmVhIjoiSDA5MSIsImJ1c2luZXNzQXJlYU5hbWUiOiLguIHguJ_guK0u4LmB4LiB4Lil4LiHIiwiZGVwdENoYW5nZUNvZGUiOiI0MzAyNTIxMDIwMDAyMDAiLCJwb3NpdGlvbldpdGhEZXB0TmFtZSI6IiIsImlzcyI6Imh0dHBzOi8vYXBpLWNlYy1kZXYucGVhLmNvLnRoIiwic3ViIjoiNTEyMzI1IiwiYXVkIjpbInBlYS1jbWNkIl0sImV4cCI6MTc2NDE2NDA5NCwiaWF0IjoxNzY0MTQ5Njk0LCJqdGkiOiJkNGpjamZqOGxkYmVpdWowMWhzMCJ9.uWWp6rs2LeJhUk394dfhJbIwyGAwoO4t8-0ljeaQt9E", {
-
-        path: "/",
-        expires: 1 / 24, // 1 ชั่วโมงeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjE3ODMsImVtcGxveWVlSWQiOiI1MTIzMjUiLCJ0aXRsZSI6IuC4meC4suC4oiIsImZpcnN0TmFtZSI6IuC4iuC4seC4iuC4nuC4pSIsImxhc3ROYW1lIjoi4LiK4Li54Lin4LiH4Lio4LmM4Lin4Li44LiS4Li0IiwicG9zaXRpb24iOiLguJ7guIrguIcuMyjguK7guKUpIiwiYnVzaW5lc3NBcmVhIjoiSDA5MSIsImJ1c2luZXNzQXJlYU5hbWUiOiLguIHguJ_guK0u4LmB4LiB4Lil4LiHIiwiZGVwdENoYW5nZUNvZGUiOiI0MzAyNTIxMDIwMDAyMDAiLCJwb3NpdGlvbldpdGhEZXB0TmFtZSI6IiIsImlzcyI6Imh0dHBzOi8vYXBpLWNlYy1kZXYucGVhLmNvLnRoIiwic3ViIjoiNTEyMzI1IiwiYXVkIjpbInBlYS1jbWNkIl0sImV4cCI6MTc2MzY2NjMyMCwiaWF0IjoxNzYzNjUxOTIwLCJqdGkiOiJkNGZqMmsxYWMycGpvZ2lvcWNmZyJ9.Tsaic4RtUi5S7yxUw9zxX6XIIUBU5IzfZgfdz-4fdK8
-      });
-
-      const cleanUrl = window.location.pathname;
-      window.history.replaceState(null, "", cleanUrl);
-
-      setTimeout(() => {
+      // ถ้ามี token ใน cookies อยู่แล้ว
+      if (existingToken && !tokenFromUrl) {
+        console.log("Existing token found, redirecting to management...");
         router.push("/management");
-      }, 100);
-    } else if (code) {
-      // Handle Keycloak authorization code
-      // You might want to exchange this code for a token
-      console.log("Authorization code received:", code);
+        return;
+      }
 
-      console.log("Token", token)
-      // For now, redirect to dashboard
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 100);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 0);
-    }
+      // ไม่มี token เลย แสดงหน้า login
+      setLoading(false);
+    };
+
+    handleTokenFromUrl();
   }, [searchParams, router]);
 
+  const handleLogin = () => {
+    try {
+      console.log("Redirecting to Keycloak login:", ssoLoginUrl);
+      
+      // สร้าง redirect URL ที่ถูกต้อง
+      const redirectUri = encodeURIComponent(window.location.origin);
+      const loginUrl = ssoLoginUrl.includes('?') 
+        ? `${ssoLoginUrl}&redirect_uri=${redirectUri}`
+        : `${ssoLoginUrl}?redirect_uri=${redirectUri}`;
+      
+      console.log("Full login URL:", loginUrl);
+      
+      // redirect ไปหน้า login
+      window.location.href = loginUrl;
+      
+    } catch (error) {
+      console.error("Error during login:", error);
+    }
+  };
+
+  const handleLogout = () => {
+    Cookies.remove("token");
+    setLoading(false);
+    console.log("Logged out successfully");
+  };
+
+  // แสดง loading spinner
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">กำลังตรวจสอบการเข้าสู่ระบบ...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-gray-100">
       {/* Left Section (Image) */}
       <div className="relative w-full h-60 lg:h-auto lg:w-1/2">
@@ -100,38 +121,43 @@ const LandingPage = () => {
 
       {/* Right Section (Login) */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center items-center px-6 py-12 bg-white space-y-6 lg:space-y-8">
-        <h1 className="text-lg md:text-xl font-semibold text-gray-700 flex items-center space-x-2">
-          <span className="flex items-center text-purple-500">
-            <Image
-              src="/next.svg"
-              alt="Logo"
-              width={40}
-              height={32}
-              className="dark:invert"
-              onContextMenu={(e) => e.preventDefault()}
-              draggable={false}
-            />
-            <span className="ml-2">CEC-DEMO</span>
-          </span>
-        </h1>
-        <p className="text-2xl md:text-3xl font-bold text-gray-800 mt-4 text-center">
-          CEC
-        </p>
-        <p className="text-gray-500 text-base md:text-lg mt-2 text-center">
-          เข้าสู่ระบบเพื่อดำเนินการต่อไป
-        </p>
-        <button
-          onClick={handleLogin}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 md:py-4 md:px-8 rounded-lg mt-8 flex items-center space-x-2 transition text-sm md:text-base"
-        >
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-          </svg>
-          <span>เข้าสู่ระบบด้วย Keycloak</span>
-        </button>
+        <div className="text-center">
+          <h1 className="text-lg md:text-xl font-semibold text-gray-700 flex items-center justify-center space-x-2 mb-4">
+            <span className="flex items-center text-purple-500">
+              <Image
+                src="/next.svg"
+                alt="Logo"
+                width={40}
+                height={32}
+                className="dark:invert"
+                onContextMenu={(e) => e.preventDefault()}
+                draggable={false}
+              />
+              <span className="ml-2">CEC-DEMO</span>
+            </span>
+          </h1>
+          
+          <p className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+            CEC System
+          </p>
+          
+          <p className="text-gray-500 text-base md:text-lg mb-8">
+            เข้าสู่ระบบเพื่อดำเนินการต่อไป
+          </p>
+        </div>
+
+        <div className="flex flex-col space-y-4">
+          <button
+            onClick={handleLogin}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 md:py-4 md:px-8 rounded-lg flex items-center justify-center space-x-2 transition text-sm md:text-base min-w-[250px]"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+            </svg>
+            <span>เข้าสู่ระบบด้วย Keycloak</span>
+          </button>
+        </div>
       </div>
     </div>
   );
-};
-
-export default LandingPage;
+}
