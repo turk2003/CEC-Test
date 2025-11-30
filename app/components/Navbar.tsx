@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import Cookies from "js-cookie";
-import { ssoLogoutUrl } from "@/service/index";
+import { ssoLogoutUrl } from "@/service/index"; 
+import Image from "next/image"; 
 
 interface NavbarProps {
   onToggleSidebar?: () => void;
@@ -27,6 +28,10 @@ const Navbar = ({ onToggleSidebar }: NavbarProps) => {
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
   const ssoLogoutUrl1 = `${ssoLogoutUrl}/${Cookies.get("token")}`;
+  const profileImageUrl = userData?.employeeId 
+    ? `https://pictureapi.pea.co.th/MyphotoAPI/api/v1/Main/GetPicImg?EmpCode=${userData.employeeId}` 
+    : null;
+    const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -75,6 +80,30 @@ const handleLogout = async () => {
     setLoggingOut(false);
   }
 };
+// Avatar Component
+  const ProfileAvatar = ({ userData }: { userData: UserData }) => {
+    if (profileImageUrl && !imageError) {
+      return (
+        <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-200">
+          <Image
+            src={profileImageUrl}
+            alt={`${userData.firstName} ${userData.lastName}`}
+            width={32}
+            height={32}
+            className="w-full h-full object-cover"
+            onError={() => setImageError(true)}
+            unoptimized // เพื่อให้ใช้ external URL ได้
+          />
+        </div>
+      );
+    }
+
+    // Fallback - แสดงตัวอักษรแรก
+    return (
+      <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+      </div>
+    );
+  };
 
   return (
     <div className="bg-white border-b border-gray-200 px-6 py-4">
@@ -119,8 +148,8 @@ const handleLogout = async () => {
               </div>
               
               {/* Avatar */}
-              <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                {userData.firstName.charAt(0)}{userData.lastName.charAt(0)}
+              <div className="w-8 h-8  rounded-full flex items-center justify-center text-white text-xs font-bold">
+                <ProfileAvatar userData={userData} />
               </div>
             </>
           ) : (
