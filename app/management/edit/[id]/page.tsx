@@ -2,13 +2,20 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { CommitteeMember, DataItem } from "@/types";
+import { CommitteeMember, DataItem, Person } from "@/types";
 import api from "@/lib/api";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import ConstructionDetailsSection from "../components/ConstructionDetailsSection";
 import SupervisorSection from "../components/SupervisorSection";
 import CommitteeSection from "../components/CommitteeSection";
+
+
+  
+  const formatFullName = (person?: Person) => {
+    if (!person) return "";
+    return `${person.title || ""}${person.firstName || ""} ${person.lastName || ""}`.trim();
+  };
 
 export default function EditPage() {
     const router = useRouter();
@@ -20,7 +27,7 @@ export default function EditPage() {
     const [formData, setFormData] = useState<Partial<DataItem>>({
         wbs: "",
         jobName: "",
-        con_sup: "",
+        supervisor: "",
         board: "",
         status: 0,
     });
@@ -32,33 +39,69 @@ export default function EditPage() {
 
             try {
                 setLoading(true);
-                const response = await api.get(`/list/${id}`);
-                setFormData(response.data);
+                const response = await api.get(`/api/v3/jobs`, {
+                    params: {
+                        ba: 'ALL',
+                        wbs: id
+                    }
+                });
+
+                // ตรวจสอบ structure ของ response
+                const rawData = response.data;
+
+                // ดึงข้อมูล payload
+                const payload =
+                    Array.isArray(rawData?.data) && rawData.data.length > 0
+                        ? rawData.data[0]
+                        : rawData?.data ?? rawData ?? {};
+
+                // Map ข้อมูล supervisor
+                const supervisorName = formatFullName(payload.supervisor);
+
+                // Map ข้อมูล chairman/board
+                const chairmanName = formatFullName(payload.chairman) || payload.board || "";
+
+                setFormData({
+                    wbs: payload.wbs ?? "",
+                    jobName: payload.jobName ?? "",
+                    supervisor: supervisorName,
+                    firstCommittee: chairmanName,
+                    jobStatus: payload.jobStatus ?? payload.status ?? "",
+                    // เก็บ supervisor object ไว้ด้วย
+                    supervisorObject: payload.supervisor || null,
+                    planNo: payload.planNo ?? "",
+                });
+
                 setCommitteeMembers([
                     {
                         id: "chair",
                         roleLabel: "ชื่อ - สกุล (ประธานคณะกรรมการ)",
-                        employeeId: "",
-                        name: response.data?.board || "",
-                        position: "ระดับพนักงาน"
+                        employeeId: payload.chairman?.employeeId || "",
+                        name: chairmanName,
+                        position: payload.chairman?.position || "ระดับพนักงาน"
                     },
                     {
                         id: "member-1",
                         roleLabel: "ชื่อ - สกุล (คณะกรรมการ)",
-                        employeeId: "",
-                        name: "",
-                        position: "ระดับพนักงาน"
+                        employeeId: payload.firstCommittee?.employeeId || "",
+                        name: formatFullName(payload.firstCommittee),
+                        position: payload.firstCommittee?.position || "ระดับพนักงาน"
                     },
                     {
                         id: "member-2",
                         roleLabel: "ชื่อ - สกุล (คณะกรรมการ)",
-                        employeeId: "",
-                        name: "",
-                        position: "ระดับพนักงาน"
+                        employeeId: payload.secondCommittee?.employeeId || "",
+                        name: formatFullName(payload.secondCommittee),
+                        position: payload.secondCommittee?.position || "ระดับพนักงาน",
+
                     }
                 ]);
-            } catch (error) {
-                console.error("Error fetching data:", error);
+
+            } catch (error: any) {
+                console.error("=== Error Fetching Data ===");
+                console.error("Error:", error);
+                console.error("Error Message:", error.message);
+                console.error("Error Response:", error.response?.data);
                 alert("ไม่สามารถโหลดข้อมูลได้");
             } finally {
                 setLoading(false);
@@ -97,25 +140,24 @@ export default function EditPage() {
         router.push("/management");
     };
 
-    const supervisorInfo = useMemo(
-        () => ({
-            employeeId: "497735",
-            fullName: formData.con_sup || "ไม่พบข้อมูล",
-            position: "วศก.6 กฟส.สองพี่น้อง"
-        }),
-        [formData.con_sup]
-    );
+    const supervisorInfo = useMemo(() => {
+        const supervisor = (formData as any).supervisorObject;
+        return {
+            employeeId: supervisor?.employeeId || "",
+            fullName: formData.supervisor || supervisor
+                ? `${supervisor?.title || ''}${supervisor?.firstName || ''} ${supervisor?.lastName || ''}`.trim()
+                : "ไม่พบข้อมูล",
+            position: supervisor?.position || supervisor?.positionWithDeptName || ""
+        };
+    }, [formData]);
 
     const handleLinkOldEstimate = () => {
-        console.log("เชื่อมประมาณการเก่า");
     };
 
     const handleLinkNewEstimate = () => {
-        console.log("เชื่อมประมาณการใหม่");
     };
 
     const handleAddSupervisor = () => {
-        console.log("เพิ่มช่างผู้ควบคุมงาน");
     };
 
     const handleCommitteeMemberChange = (id: string, field: keyof CommitteeMember, value: string) => {
@@ -141,6 +183,7 @@ export default function EditPage() {
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">
                     แก้ไขข้อมูลงานก่อสร้าง
                 </h1>
+                <p className="mb-4 text-sm text-gray-600">WBS: {id}</p>
             </div>
 
             {/* Breadcrumb */}
@@ -167,20 +210,20 @@ export default function EditPage() {
 
                     <CommitteeSection members={committeeMembers} onMemberChange={handleCommitteeMemberChange} />
 
-                    
+
                     {/* Buttons */}
                     <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
                         <button
                             type="button"
                             onClick={handleCancel}
-                            className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                            className="px-6 py-2 border border-purple-500 rounded-md text-purple-800 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
                         >
                             ยกเลิก
                         </button>
                         <button
                             type="submit"
                             disabled={saving}
-                            className="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-6 py-2 border border-purple-800 rounded-md text-white bg-purple-800 bg-purple-500 focus:outline-none focus:ring-2 focus:ring-gray-200"
                         >
                             {saving ? "กำลังบันทึก..." : "บันทึก"}
                         </button>

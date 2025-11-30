@@ -11,12 +11,25 @@ type ConstructionDetailsSectionProps = {
 const readOnlyInputClass =
   "w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed text-gray-500";
 
+const editableInputClass =
+  "w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500";
+
+const enableBtnOld =
+  "px-6 py-2 border border-purple-500 rounded-md text-purple-800 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
+
+const enableBtnNew =
+  "px-6 py-2 border border-purple-800 rounded-md text-white bg-purple-800 bg-purple-500 focus:outline-none focus:ring-2 focus:ring-gray-200"
+
+const disabledBtn =
+  "px-6 py-2 border border-gray-300 rounded-md text-gray-500 bg-gray-200 "
+
 export default function ConstructionDetailsSection({
   formData,
   onFieldChange,
   onLinkOldEstimate,
   onLinkNewEstimate
 }: ConstructionDetailsSectionProps) {
+  console.log({ "อยากให้แสดงข้อมูลของหน้านี้ มี wbs:": formData.wbs })
   return (
     <section>
       <div className="flex items-center gap-2 mb-4">
@@ -34,7 +47,7 @@ export default function ConstructionDetailsSection({
 
       <div className="grid grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2 ">
             WBS <span className="text-red-500">*</span>
           </label>
           <input
@@ -66,12 +79,13 @@ export default function ConstructionDetailsSection({
             หมายเลขผังงาน <span className="text-red-500">*</span>
           </label>
           <input
+
             type="text"
-            value="หมายเลขผังงาน"
-            onChange={(e) => onFieldChange?.("wbs", e.target.value)}
-            className={readOnlyInputClass}
+            value={formData.planNo}
+            onChange={(e) => onFieldChange?.("planNo", e.target.value)}
+            className={formData.jobStatus === "UNLINKED" ? editableInputClass : readOnlyInputClass}
             placeholder="กรอก WBS"
-            disabled
+            disabled={formData.jobStatus === "UNLINKED" ? false : true}
           />
         </div>
 
@@ -79,14 +93,16 @@ export default function ConstructionDetailsSection({
           <button
             type="button"
             onClick={onLinkOldEstimate}
-            className="px-6 py-2 border border-gray-300 rounded-md text-gray-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
+            className={formData.jobStatus === "UNLINKED" ? enableBtnOld : disabledBtn}
+            disabled={formData.jobStatus === "UNLINKED" ? false : true}
           >
             เชื่อมประมาณการเก่า
           </button>
           <button
             type="button"
             onClick={onLinkNewEstimate}
-            className="px-6 py-2 border border-gray-300 rounded-md text-gray-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
+            className={formData.jobStatus === "UNLINKED" ? enableBtnNew : disabledBtn}
+            disabled={formData.jobStatus === "UNLINKED" ? false : true}
           >
             เชื่อมประมาณการใหม่
           </button>

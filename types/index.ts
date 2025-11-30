@@ -44,3 +44,17 @@ export type DataItem = {
   isSupervisor: boolean | null;
   total : number;
 };
+
+export type CommitteeMember = {
+  id: string;
+  roleLabel: string;
+  employeeId: string;
+  name: string;
+  position: string;
+};
+
+export type Person = {
+  title?: string;
+  firstName?: string;
+  lastName?: string;
+};

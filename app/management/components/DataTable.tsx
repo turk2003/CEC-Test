@@ -50,8 +50,13 @@ export default function DataTable({ data, loading, filters, onFilterChange, page
     }, 500);
   }, [filters, onFilterChange]);
 
-    const handleRowClick = (itemId: number) => { // เปลี่ยนจาก string เป็น number
-    router.push(`/management/constructions/${itemId}`);
+  const handleRowClick = (wbs: string) => { 
+    router.push(`/management/edit/${wbs}`);
+  };
+
+  const handleEdit = (wbs: string) => {
+    console.log('กดแก้ไข WBS:', wbs);
+    router.push(`/management/edit/${wbs}`);
   };
 
   const clearAllFilters = () => {
@@ -151,9 +156,9 @@ export default function DataTable({ data, loading, filters, onFilterChange, page
           {Array.isArray(data) && data.length > 0 ? (
             data.map((item, index) => (
               <tr
-                key={item.id}
+                key={item.wbs}
                 className="border-b border-gray-100 hover:bg-purple-50 cursor-pointer transition-colors"
-                onClick={() => handleRowClick(item.id)}
+                onClick={() => handleRowClick(item.wbs)}
               >
                 <td className="py-4 px-4 text-gray-900">{(currentPage - 1) * currentItemsPerPage + index + 1}</td>
                 <td className="py-4 px-4 text-gray-900 font-mono text-sm">{item.wbs}</td>
@@ -182,10 +187,10 @@ export default function DataTable({ data, loading, filters, onFilterChange, page
                   }}
                 >
                   <ActionMenu
-                    id={item.id}
+                    id={item.wbs}
                     status={String(item.jobStatus)}
-                    onEdit={() => console.log(`แก้ไข ${item.jobName}`)}
-                    onReset={() => console.log(`รีเซ็ต ${item.jobName}`)}
+                    onEdit={() => handleEdit(item.wbs)}
+                    onReset={() => console.log(`รีเซ็ต ${item.wbs}`)}
                   />
                 </td>
               </tr>

@@ -1,5 +1,5 @@
 "use client";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 import React, { useEffect, useState, useCallback } from "react";
 import { DataItem } from "@/types";
 import api from "@/lib/api";
@@ -33,7 +33,7 @@ const fetchData = useCallback(async () => {
     // สร้าง parameters สำหรับ API
     const params: any = {
       page,
-      limit: 10,
+      limit: itemsPerPage,
       all: activeTab === 'all',
     };
 
@@ -177,66 +177,122 @@ const fetchData = useCallback(async () => {
             itemsPerPage={itemsPerPage}
           />
           
-          {/* Pagination */}
-          <div className="flex justify-between items-center p-4 border-t bg-gray-50">
-            <div className="text-sm text-gray-600">
-              แสดง {data.length} รายการ จากทั้งหมด {totalItems} รายการ
-              {totalPages > 1 && ` (หน้า ${page} จาก ${totalPages})`}
-            </div>
-            
-            <div className="flex items-center gap-2">
-              {/* Pagination buttons */}
+          {/* Pagination and Items Per Page */}
+          <div className="flex justify-center items-center gap-6 p-4 border-t bg-gray-50">
+            {/* New Numbered Pagination */}
+            <div className="flex items-center gap-1">
+              {/* First Page */}
               <button
                 onClick={() => setPage(1)}
                 disabled={page === 1 || loading}
-                className="px-3 py-1 text-sm text-gray-600 hover:text-purple-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="px-2 py-1 text-gray-700 hover:bg-gray-200 rounded disabled:opacity-30"
               >
-                «« แรก
+                ««
               </button>
 
+              {/* Previous Page */}
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1 || loading}
-                className="px-3 py-1 text-sm text-gray-600 hover:text-purple-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="px-2 py-1 text-gray-700 hover:bg-gray-200 rounded disabled:opacity-30"
               >
-                ‹ ก่อนหน้า
+                ‹
               </button>
 
-              <span className="px-3 py-1 bg-purple-600 text-white rounded text-sm">
-                {page}
-              </span>
+              {/* Page Numbers with Ellipsis */}
+              {(() => {
+                const pages = [];
+                const total = totalPages;
 
+                const add = (p) =>
+                  pages.push(
+                    <button
+                      key={p}
+                      onClick={() => setPage(p)}
+                      className={`px-3 py-1 rounded ${
+                        page === p
+                          ? "bg-white border-1 border-gray-300 text-black font-semibold"
+                          : "text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  );
+
+                if (total <= 5) {
+                  for (let p = 1; p <= total; p++) add(p);
+                } else {
+                  add(1);
+
+                  if (page > 3) {
+                    pages.push(
+                      <span key="start-ellipsis" className="px-2 text-gray-500">
+                        …
+                      </span>
+                    );
+                  }
+
+                  const start = Math.max(2, page - 1);
+                  const end = Math.min(total - 1, page + 1);
+                  for (let p = start; p <= end; p++) add(p);
+
+                  if (page < total - 2) {
+                    pages.push(
+                      <span key="end-ellipsis" className="px-2 text-gray-500">
+                        …
+                      </span>
+                    );
+                  }
+
+                  add(total);
+                }
+
+                return pages;
+              })()}
+
+              {/* Next Page */}
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages || loading}
-                className="px-3 py-1 text-sm text-gray-600 hover:text-purple-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="px-2 py-1 text-gray-700 hover:bg-gray-200 rounded disabled:opacity-30"
               >
-                ถัดไป ›
+                ›
               </button>
 
+              {/* Last Page */}
               <button
                 onClick={() => setPage(totalPages)}
                 disabled={page === totalPages || loading}
-                className="px-3 py-1 text-sm text-gray-600 hover:text-purple-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="px-2 py-1 text-gray-700 hover:bg-gray-200 rounded disabled:opacity-30"
               >
-                ท้าย »»
+                »»
               </button>
             </div>
 
-            <select
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(Number(e.target.value));
-                setPage(1);
-              }}
-              className="border border-gray-300 px-3 py-1 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-purple-500"
-              disabled={loading}
-            >
-              <option value={10}>10 รายการ</option>
-              <option value={20}>20 รายการ</option>
-              <option value={50}>50 รายการ</option>
-              <option value={100}>100 รายการ</option>
-            </select>
+            <div className="ml-4">
+              <select
+                value={itemsPerPage}
+                onChange={(e) => {
+                  setItemsPerPage(Number(e.target.value));
+                  setPage(1);
+                }}
+                className="border 
+                border-gray-300 
+                px-3 py-1 rounded 
+                text-sm 
+                text-gray-700
+                bg-white 
+                focus:outline-none 
+                focus:ring-1 
+                focus:ring-purple-500"
+                disabled={loading}
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
-import React from "react";
+import api from "@/lib/api";
+import React, { useState, useEffect } from "react";
 
 type SupervisorInfo = {
   employeeId: string;
@@ -9,12 +10,127 @@ type SupervisorInfo = {
 type SupervisorSectionProps = {
   supervisor: SupervisorInfo;
   onAddSupervisor?: () => void;
+  onSupervisorChange?: (newSupervisor: SupervisorInfo) => void;
 };
 
 const readOnlyInputClass =
   "w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed text-gray-500";
 
-export default function SupervisorSection({ supervisor, onAddSupervisor }: SupervisorSectionProps) {
+const editableInputClass =
+  "w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900";
+
+export default function SupervisorSection({
+  supervisor,
+  onAddSupervisor,
+  onSupervisorChange,
+}: SupervisorSectionProps) {
+  const [localSupervisor, setLocalSupervisor] = useState<SupervisorInfo>(supervisor);
+  const [employeeIdInput, setEmployeeIdInput] = useState(supervisor.employeeId);
+  const [fullNameInput, setFullNameInput] = useState(supervisor.fullName);
+
+  async function fetchEmployeeById(employeeId: string) {
+    if (!employeeId) return;
+
+    try {
+      const response = await api.get(`/api/v1/employees/${employeeId}`);
+      const data = response.data;
+      console.log("ข้อมูลที่ได้จากรหัสพนักงาน :", data);
+
+      if (
+        data.firstName != null && data.firstName.trim() !== "" &&
+        data.lastName != null && data.lastName.trim() !== "" &&
+        data.position != null && data.position.trim() !== ""
+      ) {
+        const updatedSupervisor: SupervisorInfo = {
+          employeeId: data.employeeId,
+          fullName: `${data.firstName} ${data.lastName}`,
+          position: data.position,
+        };
+        console.log("Employss : ", updatedSupervisor.employeeId);
+        console.log("Name : ", updatedSupervisor.fullName);
+        console.log("Position : ", updatedSupervisor.position);
+        setLocalSupervisor(updatedSupervisor);
+        setEmployeeIdInput(data.employeeId);
+        setFullNameInput(`${data.firstName} ${data.lastName}`);
+        if (onSupervisorChange) onSupervisorChange(updatedSupervisor);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function fetchEmployeeByName(name: string) {
+    if (!name) return;
+
+    try {
+      const response = await api.get(`/api/v1/employees/name/${name}`);
+      const data = response.data;
+
+      if (!Array.isArray(data) || data.length === 0) {
+        console.warn("ไม่พบข้อมูลพนักงานจากชื่อ:", name);
+        return;
+      }
+
+      const employeeData = data[0];
+
+      console.log("ข้อมูลที่ได้จากชื่อ:", employeeData);
+      console.log("รหัสพนักงาน:", employeeData.employeeId);
+      console.log("ชื่อ:", `${employeeData.firstName} ${employeeData.lastName}`);
+      console.log("ตำแหน่ง:", employeeData.position);
+
+      if (
+        employeeData.firstName != null && employeeData.firstName.trim() !== "" &&
+        employeeData.lastName != null && employeeData.lastName.trim() !== "" &&
+        employeeData.position != null && employeeData.position.trim() !== ""
+      ) {
+        const updatedSupervisor: SupervisorInfo = {
+          employeeId: employeeData.employeeId,
+          fullName: `${employeeData.firstName} ${employeeData.lastName}`,
+          position: employeeData.position,
+        };
+
+        setLocalSupervisor(updatedSupervisor);
+        setEmployeeIdInput(employeeData.employeeId);
+        setFullNameInput(`${employeeData.firstName} ${employeeData.lastName}`);
+        if (onSupervisorChange) onSupervisorChange(updatedSupervisor);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  // debounce: รอพิมพ์หยุด 500ms ก่อน fetch employee by ID
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      fetchEmployeeById(employeeIdInput);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [employeeIdInput]);
+
+  // debounce: รอพิมพ์หยุด 500ms ก่อน fetch employee by name
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      fetchEmployeeByName(fullNameInput);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [fullNameInput]);
+
+  function handleEmployeeIdChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setEmployeeIdInput(e.target.value);
+    setLocalSupervisor((prev) => ({ ...prev, employeeId: e.target.value }));
+  }
+
+  function handleFullNameChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setFullNameInput(e.target.value);
+    setLocalSupervisor((prev) => ({ ...prev, fullName: e.target.value }));
+  }
+
   return (
     <section>
       <div className="flex items-center gap-2 mb-4">
@@ -35,22 +151,36 @@ export default function SupervisorSection({ supervisor, onAddSupervisor }: Super
           <label className="block text-sm font-medium text-gray-700 mb-2">
             หมายเลขพนักงาน <span className="text-red-500">*</span>
           </label>
-          <input type="text" value={supervisor.employeeId} className={readOnlyInputClass} disabled />
+          <input
+            type="text"
+            value={employeeIdInput || ""}
+            onChange={handleEmployeeIdChange}
+            className={editableInputClass}
+          />
         </div>
 
         <div className="col-span-12 sm:col-span-6 lg:col-span-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             ชื่อ - สกุล <span className="text-red-500">*</span>
           </label>
-          <input type="text" value={"นายนพนันต์ พรหมศรี"} className={readOnlyInputClass} disabled />
-          {/* <input type="text" value={supervisor.fullName} className={readOnlyInputClass} disabled /> */}
+          <input
+            type="text"
+            value={fullNameInput || ""}
+            onChange={handleFullNameChange}
+            className={editableInputClass}
+          />
         </div>
 
         <div className="col-span-12 sm:col-span-3 lg:col-span-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             ตำแหน่ง <span className="text-red-500">*</span>
           </label>
-          <input type="text" value={supervisor.position} className={readOnlyInputClass} disabled />
+          <input
+            type="text"
+            value={localSupervisor.position || ""}
+            className={readOnlyInputClass}
+            disabled
+          />
         </div>
 
         <div className="col-span-12">
@@ -72,4 +202,3 @@ export default function SupervisorSection({ supervisor, onAddSupervisor }: Super
     </section>
   );
 }
-

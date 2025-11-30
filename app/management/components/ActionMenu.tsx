@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface ActionMenuProps {
-  id: number;
+  id: string;
   status: string;
   onEdit?: () => void;
   onReset?: () => void;
@@ -17,8 +17,11 @@ export default function ActionMenu({ id, status, onEdit, onReset }: ActionMenuPr
 
   const handleEdit = () => {
     setOpen(false);
-    router.push(`/management/edit/${id}`);
-    onEdit?.();
+    if (onEdit) {
+      onEdit();
+    } else {
+      router.push(`/management/edit/${id}`);
+    }
   };
 
   return (
