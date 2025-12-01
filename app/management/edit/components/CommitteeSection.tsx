@@ -7,7 +7,9 @@ type CommitteeSectionProps = {
   onMemberChange?: (id: string, field: keyof CommitteeMember, value: string) => void;
 };
 const editableInputClass =
-  "w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500";
+  "w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500";
+  const editDisabledInputClass =
+  "w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500";
 
 export default function CommitteeSection({ members, onMemberChange }: CommitteeSectionProps) {
   return (
@@ -34,7 +36,7 @@ export default function CommitteeSection({ members, onMemberChange }: CommitteeS
               </label>
               <input
                 type="text"
-                value={"หมายเลขพนักงาน"}
+                value={member.employeeId}
                 onChange={(e) => onMemberChange?.(member.id, "employeeId", e.target.value)}
                 className={editableInputClass}
               />
@@ -46,7 +48,7 @@ export default function CommitteeSection({ members, onMemberChange }: CommitteeS
               </label>
               <input
                 type="text"
-                value={"ชื่อ - สกุล พนักงาน"}
+                value={member.name}
                 onChange={(e) => onMemberChange?.(member.id, "name", e.target.value)}
                 className={editableInputClass}
               />
@@ -60,7 +62,8 @@ export default function CommitteeSection({ members, onMemberChange }: CommitteeS
                 type="text"
                 value={member.position || ""}
                 onChange={(e) => onMemberChange?.(member.id, "position", e.target.value)}
-                className={editableInputClass}
+                className={editDisabledInputClass}
+                disabled={true}
               />
             </div>
           </div>

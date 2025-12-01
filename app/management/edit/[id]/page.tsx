@@ -11,11 +11,11 @@ import SupervisorSection from "../components/SupervisorSection";
 import CommitteeSection from "../components/CommitteeSection";
 
 
-  
-  const formatFullName = (person?: Person) => {
+
+const formatFullName = (person?: Person) => {
     if (!person) return "";
     return `${person.title || ""}${person.firstName || ""} ${person.lastName || ""}`.trim();
-  };
+};
 
 export default function EditPage() {
     const router = useRouter();
@@ -61,6 +61,7 @@ export default function EditPage() {
                 // Map ข้อมูล chairman/board
                 const chairmanName = formatFullName(payload.chairman) || payload.board || "";
 
+
                 setFormData({
                     wbs: payload.wbs ?? "",
                     jobName: payload.jobName ?? "",
@@ -72,13 +73,15 @@ export default function EditPage() {
                     planNo: payload.planNo ?? "",
                 });
 
+                
+                
                 setCommitteeMembers([
                     {
                         id: "chair",
                         roleLabel: "ชื่อ - สกุล (ประธานคณะกรรมการ)",
-                        employeeId: payload.chairman?.employeeId || "",
-                        name: chairmanName,
-                        position: payload.chairman?.position || "ระดับพนักงาน"
+                        employeeId: payload.chairman.employeeId,
+                        name: payload.chairman.firstName + " " + payload.chairman.lastName,
+                        position: payload.chairman?.position 
                     },
                     {
                         id: "member-1",
@@ -96,6 +99,8 @@ export default function EditPage() {
 
                     }
                 ]);
+
+                
 
             } catch (error: any) {
                 console.error("=== Error Fetching Data ===");
