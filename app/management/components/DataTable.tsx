@@ -72,14 +72,6 @@ export default function DataTable({ data, loading, filters, onFilterChange, page
   const currentPage = page || 1;
   const currentItemsPerPage = itemsPerPage || 10;
 
-  if (loading) {
-    return (
-      <div className="text-center py-8 text-gray-500">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-2"></div>
-        กำลังโหลดข้อมูล...
-      </div>
-    );
-  }
 
   return (
     <div className="overflow-x-auto">
@@ -153,7 +145,16 @@ export default function DataTable({ data, loading, filters, onFilterChange, page
         </thead>
 
         <tbody>
-          {Array.isArray(data) && data.length > 0 ? (
+          {loading ? (
+            <tr>
+              <td colSpan={7} className="text-center py-8 text-gray-500">
+                <div className="flex flex-col items-center space-y-2">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                  <p>กำลังโหลดข้อมูล...</p>
+                </div>
+              </td>
+            </tr>
+          ) :Array.isArray(data) && data.length > 0 ? (
             data.map((item, index) => (
               <tr
                 key={item.wbs}
