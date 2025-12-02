@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import api from "@/lib/api";
+import { useState } from "react";
+import { useUser } from "@/contexts/UserContext";
 import Cookies from "js-cookie";
 import { ssoLogoutUrl } from "@/service/index"; 
 import Image from "next/image"; 
@@ -10,78 +10,44 @@ interface NavbarProps {
   onToggleSidebar?: () => void;
 }
 
-interface UserData {
-  businessArea: string;
-  businessAreaName: string;
-  deptChangeCode: string;
-  employeeId: string;
-  firstName: string;
-  id: number;
-  lastName: string;
-  position: string;
-  positionWithDeptName: string;
-  title: string;
-}
-
 const Navbar = ({ onToggleSidebar }: NavbarProps) => {
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { userData, userRegionName, loading } = useUser();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  
   const ssoLogoutUrl1 = `${ssoLogoutUrl}/${Cookies.get("token")}`;
   const profileImageUrl = userData?.employeeId 
     ? `https://pictureapi.pea.co.th/MyphotoAPI/api/v1/Main/GetPicImg?EmpCode=${userData.employeeId}` 
     : null;
-    const [imageError, setImageError] = useState(false);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await api.get('/api/v1/employees/me');
-        setUserData(response.data);
-        console.log('User data:', response.data);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, []);
 
   // ฟังก์ชัน logout ใหม่
-const handleLogout = async () => {
-  try {
-    setLoggingOut(true);
+  const handleLogout = async () => {
+    try {
+      setLoggingOut(true);
+      window.location.href = ssoLogoutUrl1;
+      
+      // ลบ token และข้อมูลในเครื่อง
+      Cookies.remove("token", { path: "/" });
+      Cookies.remove("token", { path: "/management" });
+      Cookies.remove("token");
+      
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      console.log('Redirecting to home...');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      Cookies.remove("token", { path: "/" });
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = "/";
+    } finally {
+      setLoggingOut(false);
+    }
+  };
 
-    window.location.href = ssoLogoutUrl1;
-
-    // ลบ token และข้อมูลในเครื่อง
-    Cookies.remove("token", { path: "/" });
-    Cookies.remove("token", { path: "/management" });
-    Cookies.remove("token"); // ลบแบบไม่ระบุ path
-    
-    // ล้าง storage
-    localStorage.clear();
-    sessionStorage.clear();
-    
-    console.log('Redirecting to home...');
-   
-    
-  } catch (error) {
-    console.error('Error during logout:', error);
-    
-    // ถึงแม้จะ error ก็ยัง force logout
-    Cookies.remove("token", { path: "/" });
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.href = "/";
-  } finally {
-    setLoggingOut(false);
-  }
-};
-// Avatar Component
-  const ProfileAvatar = ({ userData }: { userData: UserData }) => {
+  // Avatar Component
+  const ProfileAvatar = ({ userData }: { userData: any }) => {
     if (profileImageUrl && !imageError) {
       return (
         <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-200">
@@ -92,15 +58,15 @@ const handleLogout = async () => {
             height={32}
             className="w-full h-full object-cover"
             onError={() => setImageError(true)}
-            unoptimized // เพื่อให้ใช้ external URL ได้
+            unoptimized
           />
         </div>
       );
     }
 
-    // Fallback - แสดงตัวอักษรแรก
     return (
       <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+        {userData.title?.charAt(0) || userData.firstName?.charAt(0) || '?'}
       </div>
     );
   };
@@ -140,15 +106,15 @@ const handleLogout = async () => {
               {/* ชื่อผู้ใช้ */}
               <div className="text-right">
                 <div className="text-sm font-medium text-gray-900">
-                  {userData.title} {userData.firstName} {userData.lastName}
+                  {userData.title}{userData.firstName} {userData.lastName}
                 </div>
                 <div className="text-xs text-gray-500">
-                  {userData.position} ({userData.businessAreaName})
+                  {userData.position}
                 </div>
               </div>
               
               {/* Avatar */}
-              <div className="w-8 h-8  rounded-full flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold">
                 <ProfileAvatar userData={userData} />
               </div>
             </>
@@ -161,12 +127,10 @@ const handleLogout = async () => {
             </>
           )}
 
-          {/* Divider */}
           <svg width="2" height="32" viewBox="0 0 2 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <line x1="1" y1="4.37112e-08" x2="0.999999" y2="32" stroke="#454545" strokeWidth="2" strokeLinejoin="round" />
           </svg>
 
-          {/* Logout Button */}
           <button 
             onClick={handleLogout}
             disabled={loggingOut}

@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useUser } from "@/contexts/UserContext";
 import api from "@/lib/api";
-
-interface Region {
-  dept: string;
-  ba: string;
-  region: string;
-  name: string;
-}
 
 interface PeaUnit {
   ba: string;
@@ -36,14 +30,17 @@ export default function TabSection({
   onRegionChange,
   onBusinessAreaChange
 }: TabSectionProps) {
-  const [regions, setRegions] = useState<Region[]>([]);
+  const { userData, regions, userRegionName, regionsLoading, userBusinessAreaName } = useUser();
   const [peaUnits, setPeaUnits] = useState<PeaUnit[]>([]);
-  const [loading, setLoading] = useState(true);
   const [peaLoading, setPeaLoading] = useState(false);
-  
+  const [hasInteracted, setHasInteracted] = useState(false);
+  console.log('User Business Area Name:', userBusinessAreaName);
+
+
+
   // Get unique regions และใช้ Map เพื่อป้องกันการซ้ำ
   const uniqueRegions = React.useMemo(() => {
-    const regionMap = new Map<string, Region>();
+    const regionMap = new Map<string, any>();
     regions.forEach(region => {
       if (!regionMap.has(region.region)) {
         regionMap.set(region.region, region);
@@ -62,65 +59,66 @@ export default function TabSection({
     });
     return Array.from(peaMap.values());
   }, [peaUnits]);
+  
 
-  // Load regions
-  useEffect(() => {
-    const fetchRegions = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get('/api/v1/region');
-        console.log('Regions data:', response.data);
-        setRegions(response.data || []);
-      } catch (error) {
-        console.error('Error fetching regions:', error);
-        setRegions([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRegions();
-  }, []);
-
-  // Load PEA units when region changes
+  // Load PEA units when region changes OR on initial load with user's region
   useEffect(() => {
     const fetchPeaUnits = async () => {
-      if (!selectedRegion) {
-        setPeaUnits([]);
+      // ถ้ามี selectedRegion ให้โหลดตาม selectedRegion
+      if (selectedRegion) {
+        try {
+          setPeaLoading(true);
+          const response = await api.get(`/api/v2/pealist?ba=${selectedRegion}`);
+          console.log('PEA Units data:', response.data);
+          setPeaUnits(response.data || []);
+        } catch (error) {
+          console.error('Error fetching PEA units:', error);
+          setPeaUnits([]);
+        } finally {
+          setPeaLoading(false);
+        }
         return;
       }
 
-      try {
-        setPeaLoading(true);
-        const response = await api.get(`/api/v2/pealist?ba=${selectedRegion}`);
-        console.log('PEA Units data:', response.data);
-        setPeaUnits(response.data || []);
-      } catch (error) {
-        console.error('Error fetching PEA units:', error);
-        setPeaUnits([]);
-      } finally {
-        setPeaLoading(false);
+      // ถ้ายังไม่มี selectedRegion แต่มี userData.region ให้โหลดตาม user's region
+      if (!selectedRegion && userData?.region && !hasInteracted) {
+        try {
+          setPeaLoading(true);
+          const response = await api.get(`/api/v2/pealist?ba=${userData.region}`);
+          console.log('Initial PEA Units data for user region:', response.data);
+          setPeaUnits(response.data || []);
+        } catch (error) {
+          console.error('Error fetching initial PEA units:', error);
+          setPeaUnits([]);
+        } finally {
+          setPeaLoading(false);
+        }
+        return;
       }
+
+      // ถ้าไม่มีทั้งสองอย่าง ให้ clear
+      setPeaUnits([]);
     };
 
     fetchPeaUnits();
-  }, [selectedRegion]);
+  }, [selectedRegion, userData, hasInteracted]);
 
   const handleRegionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const regionValue = e.target.value;
+    setHasInteracted(true);
     
     if (regionValue === '') {
       onRegionChange('', '');
-      setPeaUnits([]); // Clear PEA units
+      setPeaUnits([]);
       return;
     }
     
-    // เมื่อเลือกเขตใหม่ ให้ส่งค่า region และ clear BA
     onRegionChange(regionValue, '');
   };
 
   const handleBusinessAreaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const baValue = e.target.value;
+    setHasInteracted(true);
     onBusinessAreaChange(baValue);
   };
 
@@ -163,39 +161,42 @@ export default function TabSection({
         <select 
           value={selectedRegion}
           onChange={handleRegionChange}
-          disabled={loading}
-          className="px-4 py-2 border border-purple-700 text-purple-700 rounded-lg text-sm bg-white disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
+          disabled={regionsLoading}
+          className="px-4 py-2 border border-purple-700 text-purple-700 rounded-lg text-sm bg-white disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px]"
         >
-          <option value="">เลือกเขต</option>
-          {loading ? (
-            <option disabled>กำลังโหลด...</option>
-          ) : (
-            uniqueRegions.map((region, index) => (
-              <option key={`region-${region.region}-${index}`} value={region.region}>
-                {region.name}
-              </option>
-            ))
-          )}
+          <option value="">
+            {regionsLoading 
+              ? "กำลังโหลด..." 
+              : !hasInteracted && userRegionName
+                ? userRegionName
+                : "เลือกเขต (ทั้งหมด)"}
+          </option>
+          {!regionsLoading && uniqueRegions.map((region, index) => (
+            <option key={`region-${region.region}-${index}`} value={region.region}>
+              {region.name}
+            </option>
+          ))}
         </select>
 
         {/* Business Area Dropdown */}
         <select 
           value={selectedBusinessArea}
           onChange={handleBusinessAreaChange}
-          disabled={loading || peaLoading || !selectedRegion}
+          disabled={regionsLoading || peaLoading || (!selectedRegion && (hasInteracted || !userData?.region))}
           className="px-4 py-2 border border-purple-700 text-purple-700 rounded-lg text-sm bg-white min-w-[250px] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <option value="">
             {!selectedRegion 
-              ? "เลือกเขตก่อน" 
+              ? (!hasInteracted && userBusinessAreaName ? userBusinessAreaName : "เลือกเขตก่อน")
               : peaLoading 
                 ? "กำลังโหลด..." 
-                : "เลือกการไฟฟ้า (ทั้งหมด)"}
+                : (!hasInteracted && userBusinessAreaName ? userBusinessAreaName : "เลือกการไฟฟ้า (ทั้งหมด)")}
           </option>
-          {!loading && !peaLoading && uniquePeaUnits.length > 0 && (
+          {!regionsLoading && !peaLoading && uniquePeaUnits.length > 0 && (
             uniquePeaUnits.map((unit, index) => (
               <option key={`pea-${unit.ba}-${index}`} value={unit.ba}>
                 {unit.baName} ({unit.ba})
+                {userData && userData.businessArea === unit.ba ? " (การไฟฟ้าของคุณ)" : ""}
               </option>
             ))
           )}
@@ -205,6 +206,7 @@ export default function TabSection({
         {(selectedRegion || selectedBusinessArea) && (
           <button
             onClick={() => {
+              setHasInteracted(false);
               onRegionChange('', '');
               setPeaUnits([]);
             }}

@@ -22,6 +22,7 @@ export default function ManagementPage() {
   const [selectedRegion, setSelectedRegion] = useState("");
   const [selectedBusinessArea, setSelectedBusinessArea] = useState("");
   
+  
   const [page, setPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
